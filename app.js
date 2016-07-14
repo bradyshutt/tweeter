@@ -7,19 +7,14 @@ var views = require('./views');
 
 global.print = utils.print;
 global.dprint = utils.dprint;
-dprint.debug = false;
+dprint.debug = true;
+
+models.initDB();
 
 http.createServer(function(request, response) {
 
-
-   print('#r[hey]; what is #g[up]; dog');
-
-
-
-
-   models.openDatabase();
-
    route(request, response);
+
    
 }).listen(8000);
 
