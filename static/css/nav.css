@@ -1,0 +1,35 @@
+/* NAV STYLESHEET */
+
+nav {
+   background-color: #000;
+   color: #FFF;
+   height: 42px;
+}
+
+nav ul {
+   display: inline-block;
+
+}
+
+nav li {
+   display: inline-block;
+   line-height: 42px;
+   font-size: 22px;
+   padding: 0 10px;
+}
+
+nav li:hover {
+   background-color: #444;
+}
+
+.nav-left {
+   float: left;
+   margin-left: 20px;
+}
+
+.nav-right {
+   float: right;
+   margin-right: 20px;
+}
+
+

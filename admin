@@ -1,0 +1,55 @@
+#!/bin/zsh
+
+SEPERATE_PANE=true
+APP_NAME='app.js'
+DB_NAME='database.db'
+
+if [[ $# > 0 ]] ; then
+
+   if [[ $1 == 'start' ]] ; then
+      if [[ $(ps au | grep node | wc -l) > 1 ]] ; then
+         printf 'Server is already running.\n'
+         printf 'Exiting.'
+         return;
+      fi
+      printf 'Starting server '
+      if [[ $SEPERATE_PANE == 'true' ]] ; then 
+         printf 'in another pane... '
+         tmux send-keys -t :0.2 'node ' $APP_NAME Enter
+         printf 'Done.\n'
+      else
+         node $APP_NAME
+         printf 'Done.\n'
+      fi
+
+
+   elif [[ $1 == 'restart' ]] ; then
+      if [[ $(ps au | grep node | wc -l) > 1 ]] ; then
+         printf 'Killing server... '
+         killall node
+         printf 'Done.\n'
+      fi
+      printf 'Starting server '
+      if [[ $SEPERATE_PANE == 'true' ]] ; then 
+         printf 'in another pane... '
+         tmux send-keys -t :0.2 'node ' $APP_NAME Enter
+         printf 'Done.\n'
+      else
+         node $APP_NAME
+         printf 'Done.\n'
+      fi
+
+   elif [[ $1 == 'destroydb' ]] ; then 
+      printf 'Destroying Database... '
+      rm $DB_NAME
+      printf 'Done.\n'
+
+   elif [[ $1 == 'stop' ]] ; then
+      printf 'Killing server... '
+      killall node
+      printf 'Done.\n'
+   fi
+
+fi
+
+

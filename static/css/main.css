@@ -1,0 +1,21 @@
+/* MAIN STYLESHEET */
+
+* {
+   box-sizing: border-box;
+   padding: 0px;
+   margin: 0px;
+   font-family: helvetica;
+}
+
+a, a:hover, a:visited {
+   color: white;
+   text-decoration: none;
+
+}
+
+body {
+   background-color: #CCC;
+}
+
+
+
