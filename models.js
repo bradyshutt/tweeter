@@ -13,9 +13,30 @@ var user_p = {
 
 };
 
-var addUser = function(fields) {
-   var user = Object.create(user_p);
+var openDatabase = function() {
+   dprint('#y[[M]];  Opening Database');
+   db.serialize(function(err) {
+      if (err) {
+         console.log(err);
+      }
+      db.run('CREATE TABLE IF NOT EXISTS users (\
+         id INTEGER PRIMARY KEY,\
+         name TEXT,\
+         username TEXT\
+      )', function(err) {
+      if (err) console.log('crap: ' + err);
+      });
+   });
+}
 
+var closeDatabase = function() {
+   dprint('#y[[M]];  Closing Database');
+   db.close();
+}
+
+var addUser = function(fields, eventEmitter) {
+   dprint('#y[[M]];  Adding new user');
+   var user = Object.create(user_p);
    user.name = fields.name;
  //  user.lastName = details.lastName;
 //   user.email = details.email;
@@ -30,45 +51,21 @@ var addUser = function(fields) {
       );
       
    });
-
    
-      
-   
-
-}
-
-var init = function() {
-   db.serialize(function(err) {
-      if (err) {
-         console.log(err);
-      }
-      
-      db.run('CREATE TABLE IF NOT EXISTS users (\
-         id INTEGER PRIMARY KEY,\
-         name TEXT,\
-         username TEXT\
-      )', function(err) {
-      if (err) console.log('crap: ' + err);
-      
-         
-      });
-   });
-}
+   dprint('#y[[M]];  - Done adding new user, calling emit');
+   eventEmitter.emit('dbAddUserFinished');
+};
 
 var getAllUsers = function(callback) {
-
    db.serialize(function() {
       db.all('SELECT * FROM users', function(err, rows) {
          callback(rows);
-         
       });
-
-      
    });
-   
 }
 
-exports.init = init;
+exports.openDatabase = openDatabase;
 exports.addUser = addUser;
 exports.getAllUsers = getAllUsers;
+exports.closeDatabase = closeDatabase;
 

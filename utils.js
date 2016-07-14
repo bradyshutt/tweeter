@@ -1,11 +1,9 @@
 
 Array.prototype.contains = function(val) {
-   
    for (var x in this) {
       if (this[x] === val)
          return true;
    }
-
    return false;
 }
 
@@ -52,7 +50,6 @@ var colors = {
    'lightCyan' : function(text) { return '\x1B[96m' + text + '\x1B[0m' }, 
    'white' : function(text) { return '\x1B[97m' + text + '\x1B[0m' }, 
 }
-
 
 exports.colors = colors;
 exports.print = print;

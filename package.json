@@ -9,6 +9,7 @@
   "author": "Brady Shutt",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^0.8.7",
     "formidable": "^1.0.17",
     "less": "^2.7.1",
     "mustache": "^2.2.1",

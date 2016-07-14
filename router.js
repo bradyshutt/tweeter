@@ -2,23 +2,31 @@
 var url = require('url');
 var controllers = require('./controllers.js');
 var utils = require('./utils');
+var conf = require('./config');
 
 
-var route = function(c) {
-   var path = url.parse(c.request.url).pathname;
-   if (typeof c.routes[path] === 'function') {
+var routes = {
+   '/' : controllers.home, 
+   '/signup' : controllers.signUp,
+   '/signup/submit' : controllers.signUp,
+   '/users' : controllers.allUsers,
+};
+
+
+var route = function(request, response) {
+   var path = url.parse(request.url).pathname;
+   if (typeof routes[path] === 'function') {
       dprint('#y[[R]];  Routing ' + path);
-      c.routes[path](c);
    }
    else {
       var file = path.toString().match(/[^\/]+$/);
-      if (file && c.staticFiles[file]) {
+      if (file && conf.staticFiles[file]) {
          var ext = file.toString().match(/[^\.]+$/);
-         controllers.static(c, ext, file);
+         controllers.static(request, response, ext, file);
       }
       else {
          utils.print('#y[[R]];  Failed to route ' + path);
-         controllers.notFound(c);
+         controllers.notFound(request, response, path);
       }
    }
 }
