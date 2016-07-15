@@ -32,26 +32,28 @@ var dprint = function(str) {
 }
 dprint.debug = false;
 
-var colors = {
-   'black' : function(text) { return '\x1B[30m' + text + '\x1B[0m' }, 
-   'red' : function(text) { return '\x1B[31m' + text + '\x1B[0m' }, 
-   'green' : function(text) { return '\x1B[32m' + text + '\x1B[0m' }, 
-   'yellow' : function(text) { return '\x1B[33m' + text + '\x1B[0m' }, 
-   'blue' : function(text) { return '\x1B[34m' + text + '\x1B[0m' }, 
-   'magenta' : function(text) { return '\x1B[35m' + text + '\x1B[0m' }, 
-   'cyan' : function(text) { return '\x1B[36m' + text + '\x1B[0m' }, 
-   'lightGray' : function(text) { return '\x1B[37m' + text + '\x1B[0m' }, 
-   'darkGray' : function(text) { return '\x1B[90m' + text + '\x1B[0m' }, 
-   'lightRed' : function(text) { return '\x1B[91m' + text + '\x1B[0m' }, 
-   'lightGreen' : function(text) { return '\x1B[92m' + text + '\x1B[0m' }, 
-   'lightYellow' : function(text) { return '\x1B[93m' + text + '\x1B[0m' }, 
-   'lightBlue' : function(text) { return '\x1B[94m' + text + '\x1B[0m' }, 
-   'lightMagenta' : function(text) { return '\x1B[95m' + text + '\x1B[0m' }, 
-   'lightCyan' : function(text) { return '\x1B[96m' + text + '\x1B[0m' }, 
-   'white' : function(text) { return '\x1B[97m' + text + '\x1B[0m' }, 
-}
 
-exports.colors = colors;
+//var colors = {
+//   'black' : function(text) { return '\x1B[30m' + text + '\x1B[0m' }, 
+//   'red' : function(text) { return '\x1B[31m' + text + '\x1B[0m' }, 
+//   'green' : function(text) { return '\x1B[32m' + text + '\x1B[0m' }, 
+//   'yellow' : function(text) { return '\x1B[33m' + text + '\x1B[0m' }, 
+//   'blue' : function(text) { return '\x1B[34m' + text + '\x1B[0m' }, 
+//   'magenta' : function(text) { return '\x1B[35m' + text + '\x1B[0m' }, 
+//   'cyan' : function(text) { return '\x1B[36m' + text + '\x1B[0m' }, 
+//   'lightGray' : function(text) { return '\x1B[37m' + text + '\x1B[0m' }, 
+//   'darkGray' : function(text) { return '\x1B[90m' + text + '\x1B[0m' }, 
+//   'lightRed' : function(text) { return '\x1B[91m' + text + '\x1B[0m' }, 
+//   'lightGreen' : function(text) { return '\x1B[92m' + text + '\x1B[0m' }, 
+//   'lightYellow' : function(text) { return '\x1B[93m' + text + '\x1B[0m' }, 
+//   'lightBlue' : function(text) { return '\x1B[94m' + text + '\x1B[0m' }, 
+//   'lightMagenta' : function(text) { return '\x1B[95m' + text + '\x1B[0m' }, 
+//   'lightCyan' : function(text) { return '\x1B[96m' + text + '\x1B[0m' }, 
+//   'white' : function(text) { return '\x1B[97m' + text + '\x1B[0m' }, 
+//}
+//
+//exports.colors = colors;
+
 exports.print = print;
 exports.dprint = dprint;
 

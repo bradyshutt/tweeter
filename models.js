@@ -18,16 +18,12 @@ var initDB = function() {
          password TEXT NOT NULL)'
       );
 
-      db.all('SELECT * FROM users', [], function(err, data) {
-
-         var len = data.length;
-         for (var i = 0; i < len; ++i) {
-            console.log(data[i]);
-             
-         } 
-
-         
-      });
+      db.run('CREATE TABLE IF NOT EXISTS sessions (\
+         sessionID TEXT PRIMARY KEY NOT NULL,\
+         username TEXT,\
+         sessionKey TEXT NOT NULL,\
+         FOREIGN KEY(username) REFERENCES users(username))'
+      );
 
    });
 };

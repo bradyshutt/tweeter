@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^0.8.7",
+    "csprng": "^0.1.1",
     "formidable": "^1.0.17",
     "less": "^2.7.1",
     "mustache": "^2.2.1",

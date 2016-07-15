@@ -73,15 +73,9 @@ var login = function(request, response) {
                console.log('password incorrect'); 
                notFound(request, response);
             }
-
-
-            
          }) 
-            
-         
       });
    }
-   
 }
 
 

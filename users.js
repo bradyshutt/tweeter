@@ -44,10 +44,7 @@ var authenticate = function(name, password, cb) {
          dprint('#y[[U]];  .password. = ' + hash);
          console.log('testpass: ' + password);
          bcrypt.compare(password, hash, function(err, res) {
-
-
             cb(res);
-
          });
 
       }
