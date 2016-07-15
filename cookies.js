@@ -49,6 +49,10 @@ var toCookieArray = function(cookiesObj) {
                new Date().getTime() + cookiesObj[name].life
             ).toUTCString();
          }
+
+         if (cookiesObj[name].path) {
+            cookie += '; path=' + cookiesObj[name].path;
+         }
       }
       else { cookie += cookiesObj[name] };
       dprint('#b[[Cookies]]; Setting new cookie: \'' + cookie + '\'');

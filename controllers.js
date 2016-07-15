@@ -1,6 +1,7 @@
 var views = require('./views');
 var utils = require('./utils');
 var users = require('./users');
+var sessions = require('./sessions');
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 var fs = require('fs');
@@ -8,8 +9,25 @@ var formidable = require('formidable');
 
 
 var home = function(request, response) { 
-   dprint('#y[[C]];--home controller');
-   views.viewHome(response); 
+   dprint('#y[[C]]; home controller');
+   var sessionKey = request.cookies.sessionkey || null;
+   var username = request.cookies.username || null;
+
+   sessions.validateSession(username, sessionKey, 
+      function (isValidated) {
+         if (isValidated) {
+            print('#y[[C]]; home #g[recognizes active session!];');
+            users.getUser(username, function(user) {
+               content = {'body': 'LOGGED IN!!!! Welcome, ' + user.firstName};
+               views.viewHome(response, content); 
+            });
+         }
+         else {
+            print('#y[[C]]; home #r[no active session found];');
+            content = {'body': 'Not logged in.'};
+            views.viewHome(response, content); 
+         }
+      });
 };
 
 
@@ -36,6 +54,15 @@ var static = function(request, response, type, name) {
 };
 
 
+var image = function(request, response, name) {
+   dprint('#y[[C]];--Loading image: #b[' + name + '];');
+   var file = fs.readFileSync('static/images/' + name);
+   //response.writeHead(200, {'Content-Type' : 'bb' + type});
+   response.end(file);
+   
+}
+
+
 var signup = function(request, response) {
    dprint('#y[[C]];--signup controller');
    if (request.method === 'GET')
@@ -44,7 +71,6 @@ var signup = function(request, response) {
       var form = new formidable.IncomingForm();
 
       eventEmitter.on('dbAddUserFinished', function() {
-         console.log('calling allUsers now?');
          allUsers(request, response);
       });
 
@@ -63,14 +89,19 @@ var login = function(request, response) {
       var form = new formidable.IncomingForm();
 
       form.parse(request, function(err, fields) {
+         dprint('#g[[C]];--Authenticating...');
          users.authenticate(fields.username, fields.password, function(res) {
             if (res) {
-               console.log('password correct'); 
                dprint('#g[[C]];--LOGIN SUCCESS!!');
-               allUsers(request, response);
+               sessions.createSession(response, fields.username, 
+                  function(username, key) {
+                     request.cookies.sessionkey = key;
+                     request.cookies.username = username;
+                     home(request, response);
+               });
             }
             else { 
-               console.log('password incorrect'); 
+               dprint('#g[[C]]; #r[Login Unsuccessful :(];');
                notFound(request, response);
             }
          }) 
@@ -83,5 +114,6 @@ exports.home = home;
 exports.allUsers = allUsers;
 exports.notFound = notFound;
 exports.static = static;
+exports.image = image;
 exports.signup = signup;
 exports.login = login;

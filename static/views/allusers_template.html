@@ -4,18 +4,24 @@
 <main role="main">
    
 
-<ul>
-
+<div class="wrapper">
    {{#users}}
-   <ul>
-      <li>Name: {{name}}</li>
-      <li>Username: {{username}}</li>
-      <li>ID: {{id}}</li>
-   </ul>
-   <br /><br />
+      <div class="user">
+
+         <img src="images/user-default.png" alt="profile_pic">
+
+         <ul>
+            <li>{{firstName}} {{lastName}}</li>
+            <li>{{username}}</li>
+            <li>{{email}}</li>
+            <li>{{gender}}</li>
+         </ul>
+
+      </div>
+
    {{/users}}
-   
-</ul>
+      
+</div>
 
 </main>
     

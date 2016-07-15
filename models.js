@@ -9,17 +9,15 @@ var initDB = function() {
       db.run('PRAGMA foreign_keys = ON');
 
       db.run('CREATE TABLE IF NOT EXISTS users (\
-         id INTEGER PRIMARY KEY,\
+         username TEXT PRIMARY KEY NOT NULL,\
          firstName TEXT NOT NULL,\
          lastName TEXT NOT NULL,\
          email TEXT,\
          gender TEXT,\
-         username TEXT PRIMARY KEY NOT NULL,\
          password TEXT NOT NULL)'
       );
 
       db.run('CREATE TABLE IF NOT EXISTS sessions (\
-         sessionID TEXT PRIMARY KEY NOT NULL,\
          username TEXT,\
          sessionKey TEXT NOT NULL,\
          FOREIGN KEY(username) REFERENCES users(username))'

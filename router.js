@@ -27,6 +27,9 @@ var route = function(request, response) {
          var ext = file.toString().match(/[^\.]+$/);
          controllers.static(request, response, ext, file);
       }
+      else if (file && conf.images[file]) {
+         controllers.image(request, response, file);
+      }
       else {
          utils.print('#r[[R]];-Failed to route ' + path);
          controllers.notFound(request, response, path);

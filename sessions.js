@@ -3,72 +3,71 @@ var db = new sql.Database('database.db');
 var rand = require('csprng');
 
 
-var createSession = function(username) {
-   var sessionKey = rand(160, 36);
-   db.run('\
-      INSERT INTO sessions VALUES (NULL,?,?)', [
-         username,
-         sessionKey,
-      ]
-   );
-}
+var createSession = function(response, username, cb) {
+   var sessionKey = username + rand(160, 36);
 
+   db.serialize(function() {
 
-var session = {
+      db.run('\
+         DELETE FROM sessions \
+         WHERE username=\'' + username +'\';' 
+      );
 
-   cookies: { }, 
+      db.run('\
+         INSERT INTO sessions VALUES (?,?)', [
+            username,
+            sessionKey,
+         ]
+      );
 
-   setCookie: function(key, val) {
-      // Create a new cookie, append to cookies array
-   },
+      response.setCookie({
+         'sessionkey': { 
+            'val': sessionKey,
+            'life': 60000 * 24,
+            'path': '/',
+         },
+         'username': {
+            'val': username,
+            'life': 60000 * 24,
+            'path': '/',
+         },
+      });
 
-   removeCookie: function() {
-      // Remove a cookie
-   }, 
-
-   getCookies: function() {
-      // return object of cookies 
-   },
-
-};
-
-
-var Token = function(username) {
-   this.username = username;
-   this.loggedin = true;
-   this.lastAuthentication = Date.now();
-}
-
-
-var activeSessions = { 
-   username: [ { lastAuthentication: null, } ],
-};
-
-
-var startSession = function(request, username) {
-   var tokenObject = new Token(username);
-   var token = JSON.stringify(tokenObject);
-   
-   activeSessions[username].push(token);
-   var cookies = request.headers.cookie
-   request.setHeader('Set-Cookie', ['token']);
-
-}
-
-
-var validateSession  = function(username, token) {
-
-   activeSessions[username].forEach(function(tkn) {
-      if (tkn === token) {
+      cb(username, sessionKey);
          
-      }
-      
    });
+}
 
+
+var validateSession  = function(username, token, cb) {
+   dprint('#y[[S]]; Validating session... ');
+
+   if (username && token) {
+      db.get('\
+         SELECT * FROM sessions\
+         WHERE username = \'' + username + '\'',
+         function(err, row) {
+            if (err) throw err;
+
+            if (row.sessionKey === token) {
+               dprint('#y[[S]]; Session validation #g[Success];!');
+               cb(true);
+            }
+            else {
+               
+               dprint('#y[[S]]; Session validation failed');
+               cb(false);
+            }
+            
+         });
+   }
+   else {
+      cb(false);
+   }
    
 }
 
 
-var updateSession = function(user) {
 
-}
+exports.createSession = createSession;
+exports.validateSession = validateSession;
