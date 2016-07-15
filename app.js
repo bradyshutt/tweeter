@@ -14,18 +14,17 @@ models.initDB();
 
 http.createServer(function(request, response) {
 
-   //cookies.parseCookies(request);
+   response.cookies = cookies.parseCookies(request);
+   response.setCookie = cookies.responseSetCookie;
+   response.removeCookie = cookies.responseRemoveCookie;
 
-   //console.log(request.cookies);
+   console.log(response.cookies);
 
    //route(request, response);
 
 
-   response.cookies = cookies.parseCookies(request);
-
-   var myCookies = cookies.parseCookies(request);
-
-   cookies.setCookies(response, {
+   //cookies.setCookies(response, {
+   response.setCookie({
       'age' : {
          val: 69, 
          exp: new Date(new Date().getTime() + 5000).toUTCString(),

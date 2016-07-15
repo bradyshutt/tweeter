@@ -1,4 +1,17 @@
 
+//usage: 
+//   response.cookies = cookies.parseCookies(request);
+//   response.setCookie = cookies.responseSetCookie;
+//   response.removeCookie = cookies.responseRemoveCookie;
+//
+//   response.setCookie({
+//      'age' : {
+//         val: 69, 
+//         exp: new Date(new Date().getTime() + 5000).toUTCString(),
+//      },
+//      'power' : 9000,
+//   });
+
 
 var parseCookies = function(req) {
    var cookies = { };
@@ -52,8 +65,30 @@ var removeCookie = function(response, name) {
 }
 
 
+var responseSetCookie = function(cookiesObj) {
+   var cookies = this.cookies || { };
+   for (var name in cookiesObj) {
+      cookies[name] = cookiesObj[name];  
+   }
+   this.setHeader('Set-Cookie', toCookieArray(cookies));
+}
+
+
+var responseRemoveCookie = function(cookiesObj) {
+   var cookies = this.cookies || { };
+   for (var name in cookiesObj) {
+      cookies[name] = cookiesObj[name];  
+   }
+   this.setHeader('Set-Cookie', toCookieArray(cookies));
+}
+
+
 exports.parseCookies = parseCookies;
 exports.setCookies = setCookie;
 exports.setCookie = setCookie;
 exports.removeCookie = removeCookie;
+exports.responseSetCookie = responseSetCookie;
+exports.responseRemoveCookie = responseRemoveCookie;
+
+
 

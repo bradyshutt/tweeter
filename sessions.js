@@ -2,19 +2,21 @@ var sql = require('sqlite3').verbose();
 var db = new sql.Database('database.db');
 var rand = require('csprng');
 
+
 var createSession = function(username) {
    var sessionKey = rand(160, 36);
    db.run('\
       INSERT INTO sessions VALUES (NULL,?,?)', [
          username,
          sessionKey,
-      ]);
+      ]
+   );
 }
+
 
 var session = {
 
    cookies: { }, 
-
 
    setCookie: function(key, val) {
       // Create a new cookie, append to cookies array
@@ -28,8 +30,6 @@ var session = {
       // return object of cookies 
    },
 
-
-
 };
 
 
@@ -38,6 +38,7 @@ var Token = function(username) {
    this.loggedin = true;
    this.lastAuthentication = Date.now();
 }
+
 
 var activeSessions = { 
    username: [ { lastAuthentication: null, } ],
