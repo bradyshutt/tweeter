@@ -68,6 +68,42 @@ var validateSession  = function(username, token, cb) {
 }
 
 
+var removeSession = function(username, cb) {
+   db.serialize(function() {
+
+      db.run('\
+         DELETE FROM sessions \
+         WHERE username=\'' + username +'\';' 
+      );
+
+      db.run('\
+         INSERT INTO sessions VALUES (?,?)', [
+            username,
+            sessionKey,
+         ]
+      );
+
+      response.setCookie({
+         'sessionkey': { 
+            'val': sessionKey,
+            'life': 0,
+            'path': '/',
+         },
+         'username': {
+            'val': username,
+            'life': 0,
+            'path': '/',
+         },
+      });
+
+
+      if (cb) 
+         cb();
+         
+   });
+   
+}
+
 
 exports.createSession = createSession;
 exports.validateSession = validateSession;

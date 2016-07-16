@@ -24,3 +24,16 @@ http.createServer(function(request, response) {
    
 }).listen(8000);
 
+
+cb = function() {
+   console.log('cb not null');
+   return (() => 5)() === 5;
+};
+
+cb();
+      //(cb || function() { console.log('no callback'); })();
+      (cb || ( () => console.log('no callback') ) )();
+
+
+
+

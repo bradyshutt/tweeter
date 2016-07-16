@@ -1,5 +1,4 @@
-var views = require('./views');
-var utils = require('./utils');
+var views = require('./views');var utils = require('./utils');
 var users = require('./users');
 var sessions = require('./sessions');
 var events = require('events');
@@ -90,7 +89,7 @@ var login = function(request, response) {
 
       form.parse(request, function(err, fields) {
          dprint('#g[[C]];--Authenticating...');
-         users.authenticate(fields.username, fields.password, function(res) {
+         users.login(fields.username, fields.password, function(res) {
             if (res) {
                dprint('#g[[C]];--LOGIN SUCCESS!!');
                sessions.createSession(response, fields.username, 
@@ -107,6 +106,15 @@ var login = function(request, response) {
          }) 
       });
    }
+}
+
+
+var logout = function(request, response) {
+
+   sessions.removeSession(request.cookies.username);
+
+
+   
 }
 
 

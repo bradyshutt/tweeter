@@ -30,7 +30,7 @@ var addUser = function(fields, eventEmitter) {
 };
 
 
-var authenticate = function(name, password, cb) {
+var login = function(name, password, cb) {
    dprint('#y[[U]];  Authenticating...');
 
    db.get('SELECT firstName, password FROM users WHERE username = \'' + 
@@ -43,7 +43,6 @@ var authenticate = function(name, password, cb) {
          bcrypt.compare(password, hash, function(err, res) {
             cb(res);
          });
-
       }
    );
 };
@@ -70,6 +69,6 @@ var getUser = function(username, callback) {
 exports.addUser = addUser;
 exports.getAllUsers = getAllUsers;
 exports.getUser = getUser;
-exports.authenticate = authenticate;
+exports.login = login;
 
 
