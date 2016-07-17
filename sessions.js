@@ -5,9 +5,7 @@ var rand = require('csprng');
 
 var createSession = function(response, username, cb) {
    var sessionKey = username + rand(160, 36);
-
    db.serialize(function() {
-
       db.run('\
          DELETE FROM sessions \
          WHERE username=\'' + username +'\';' 
@@ -32,43 +30,41 @@ var createSession = function(response, username, cb) {
             'path': '/',
          },
       });
-
-      cb(username, sessionKey);
-         
+      cb();
    });
 }
 
 
 var validateSession  = function(username, token, cb) {
    dprint('#y[[S]]; Validating session... ');
-
-   if (username && token) {
+   if (username && token) { 
       db.get('\
-         SELECT * FROM sessions\
-         WHERE username = \'' + username + '\'',
-         function(err, row) {
-            if (err) throw err;
-
-            if (row.sessionKey === token) {
-               dprint('#y[[S]]; Session validation #g[Success];!');
-               cb(true);
-            }
-            else {
-               
-               dprint('#y[[S]]; Session validation failed');
-               cb(false);
-            }
-            
-         });
+         SELECT * FROM sessions \
+         JOIN users ON users.username = sessions.username \
+         WHERE users.username = \'' + username + '\''
+      , function(err, row) {
+         if (err) throw err;
+         if (row === undefined) {
+            dprint('#y[[S]]; Session validation failed');
+            cb(false, null);
+         }
+         else if (row.sessionKey === token) {
+            dprint('#y[[S]]; Session validation #g[Success];!');
+            cb(true, row);
+         }
+         else {
+            dprint('#y[[S]]; Session validation failed');
+            cb(false, null);
+         }
+      });
    }
    else {
       cb(false);
    }
-   
 }
 
 
-var removeSession = function(username, cb) {
+var removeSession = function(response, username, cb) {
    db.serialize(function() {
 
       db.run('\
@@ -76,30 +72,19 @@ var removeSession = function(username, cb) {
          WHERE username=\'' + username +'\';' 
       );
 
-      db.run('\
-         INSERT INTO sessions VALUES (?,?)', [
-            username,
-            sessionKey,
-         ]
-      );
-
       response.setCookie({
          'sessionkey': { 
-            'val': sessionKey,
+            'val': 'null',
             'life': 0,
             'path': '/',
          },
          'username': {
-            'val': username,
+            'val': 'null',
             'life': 0,
             'path': '/',
          },
       });
-
-
-      if (cb) 
-         cb();
-         
+      ( cb || (() => console.log('no cb')) )();
    });
    
 }
@@ -107,3 +92,4 @@ var removeSession = function(username, cb) {
 
 exports.createSession = createSession;
 exports.validateSession = validateSession;
+exports.removeSession = removeSession;

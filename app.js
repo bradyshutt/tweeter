@@ -12,12 +12,17 @@ dprint.debug = true;
 
 models.initDB();
 
+
 http.createServer(function(request, response) {
+
+   //sessions.validateSession(request);
 
    request.cookies = cookies.parseCookies(request);
    response.cookies = cookies.parseCookies(request);
    response.setCookie = cookies.responseSetCookie;
    response.removeCookie = cookies.responseRemoveCookie;
+   response.redirect = utils.redirectURL;
+
 
    route(request, response);
 
@@ -25,15 +30,18 @@ http.createServer(function(request, response) {
 }).listen(8000);
 
 
-cb = function() {
-   console.log('cb not null');
-   return (() => 5)() === 5;
+var staticFiles = {
+   'main.css': 1,
+   'nav.css': 1, 
+   'main.js': 1,
 };
 
-cb();
-      //(cb || function() { console.log('no callback'); })();
-      (cb || ( () => console.log('no callback') ) )();
 
-
-
-
+var images = {
+   'user-default.png': 1,
+   'athena.png': 1,
+   'burritocat.jpg': 1,
+   'businesscat.jpeg': 1,
+   'nyancat.png': 1,
+   'me.jpg': 1,
+};

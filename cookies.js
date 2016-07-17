@@ -42,9 +42,12 @@ var toCookieArray = function(cookiesObj) {
       var cookie = name + '=';
       if (typeof cookiesObj[name] === 'object') {
          cookie += cookiesObj[name].val;
-         if (cookiesObj[name].exp)
+
+         if (typeof cookiesObj[name].exp === 'number') {
             cookie += '; expires=' + cookiesObj[name].exp;
-         else if (cookiesObj[name].life) {
+
+         }
+         else if (typeof cookiesObj[name].life === 'number') {
             cookie += '; expires=' + new Date(
                new Date().getTime() + cookiesObj[name].life
             ).toUTCString();
@@ -54,7 +57,9 @@ var toCookieArray = function(cookiesObj) {
             cookie += '; path=' + cookiesObj[name].path;
          }
       }
-      else { cookie += cookiesObj[name] };
+      else { 
+         cookie += cookiesObj[name]
+      };
       dprint('#b[[Cookies]]; Setting new cookie: \'' + cookie + '\'');
       cookies.push(cookie);
    }

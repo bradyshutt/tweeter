@@ -7,6 +7,13 @@ Array.prototype.contains = function(val) {
    return false;
 }
 
+
+var redirectURL = function(url) {
+   this.writeHead(302, {'Location': url});
+   this.end();
+}
+
+
 var print = function(str) {
    str = str.replace(/\#r\[/g, '\x1B[31m');
    str = str.replace(/\#g\[/g, '\x1B[32m');
@@ -56,5 +63,6 @@ dprint.debug = false;
 
 exports.print = print;
 exports.dprint = dprint;
+exports.redirectURL = redirectURL;
 
 

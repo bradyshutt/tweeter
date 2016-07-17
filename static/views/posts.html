@@ -1,0 +1,92 @@
+
+
+
+<main role="main" class="home">
+   
+<div class="wrapper">
+   <div class="section-left">
+
+   </div>
+   <div class="section-middle">
+
+      <input type="button" name="Create Post" id="create-post-button" value="Create Post">
+
+      <div class="create-post-wrapper" id="create-post-wrapper">
+         <form action="/posts/submit" method="post">
+            <textarea name="postContent" rows="4" cols="50">What's on your mind?</textarea>
+            <div class="buttons">
+               <input type="button" id="create-post-cancel" value="Cancel Post">
+               <input type="submit" name="submit" id="submit" value="Submit">
+            </div>
+         </form>
+      </div>
+
+      <div class="posts-wrapper">
+
+<!--
+      <div class="post">
+
+         <div class="post-left">
+            <img src="images/user-default.png" alt="profile-pic" class="profile-picture">
+            <p class="username">bshizzle</p>
+         </div>
+
+         <div class="post-right">
+            <p class="post-date">Jul 14th</p>
+            <p class="post-body">"Just found this new website!! Super Cool!"</p>
+            <p class="name">- Brady Shutt</p>
+         </div>
+
+         <div class="post-options">
+            <ul>
+               <a href="#"><li>(0) like</li></a>
+               <a href="#"><li>reply</li></a>
+               <a href="#"><li>retweet</li></a>
+               <a href="#"><li>...</li></a>
+            </ul>
+         </div>
+
+      </div>
+
+-->
+      {{#posts}}
+
+      <div class="post">
+
+         <div class="post-left">
+            <img src="/images/{{profilePicture}}" alt="profile-pic" class="profile-picture">
+            <p class="username">{{username}}</p>
+         </div>
+
+         <div class="post-right">
+            <p class="post-date">{{postDate}}</p>
+            <p class="post-body">"{{postContent}}"</p>
+            <p class="name">- {{firstName}} {{lastName}}</p>
+         </div>
+
+         <div class="post-options">
+            <ul>
+               <a href="#"><li>({{numLikes}}) like</li></a>
+               <a href="#"><li>reply</li></a>
+               <a href="#"><li>retweet</li></a>
+               <a href="#"><li>...</li></a>
+            </ul>
+         </div>
+
+      </div>
+
+
+      {{/posts}}
+
+      </div>
+   </div>
+   <div class="section-right">
+
+   </div>
+
+
+
+    
+</div>
+
+</main>

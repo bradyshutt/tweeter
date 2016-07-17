@@ -14,12 +14,22 @@ var initDB = function() {
          lastName TEXT NOT NULL,\
          email TEXT,\
          gender TEXT,\
+         profilePicture TEXT,\
          password TEXT NOT NULL)'
       );
 
       db.run('CREATE TABLE IF NOT EXISTS sessions (\
          username TEXT,\
          sessionKey TEXT NOT NULL,\
+         FOREIGN KEY(username) REFERENCES users(username))'
+      );
+
+      db.run('CREATE TABLE IF NOT EXISTS posts (\
+         postID INTEGER PRIMARY KEY,\
+         username TEXT,\
+         numLikes INTEGER,\
+         postDate TEXT NOT NULL,\
+         postContent TEXT NOT NULL,\
          FOREIGN KEY(username) REFERENCES users(username))'
       );
 

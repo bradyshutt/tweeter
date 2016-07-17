@@ -3,6 +3,7 @@ var url = require('url');
 var controllers = require('./controllers.js');
 var utils = require('./utils');
 var conf = require('./config');
+var users = require('./users');
 
 
 var routes = {
@@ -12,8 +13,11 @@ var routes = {
    '/users' : controllers.allUsers,
    '/login' : controllers.login,
    '/login/submit' : controllers.login,
+   '/logout' : controllers.logout,
+   '/posts' : controllers.allPosts,
+   '/posts/submit' : controllers.submitPost,
+   '/404' : controllers.notFound,
 };
-
 
 var route = function(request, response) {
    var path = url.parse(request.url).pathname;
@@ -32,7 +36,7 @@ var route = function(request, response) {
       }
       else {
          utils.print('#r[[R]];-Failed to route ' + path);
-         controllers.notFound(request, response, path);
+         response.redirect('/404');
       }
    }
 }

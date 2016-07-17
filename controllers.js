@@ -1,4 +1,5 @@
-var views = require('./views');var utils = require('./utils');
+var views = require('./views');
+var utils = require('./utils');
 var users = require('./users');
 var sessions = require('./sessions');
 var events = require('events');
@@ -11,37 +12,59 @@ var home = function(request, response) {
    dprint('#y[[C]]; home controller');
    var sessionKey = request.cookies.sessionkey || null;
    var username = request.cookies.username || null;
+   var viewContext = { };
 
    sessions.validateSession(username, sessionKey, 
       function (isValidated) {
          if (isValidated) {
             print('#y[[C]]; home #g[recognizes active session!];');
             users.getUser(username, function(user) {
-               content = {'body': 'LOGGED IN!!!! Welcome, ' + user.firstName};
-               views.viewHome(response, content); 
+               var content = {'body': 'LOGGED IN!!!! Welcome, ' + user.firstName};
+               viewContext.user = user;
+               viewContext.loggedin = true;
+               views.viewHome(response, viewContext); 
             });
          }
          else {
             print('#y[[C]]; home #r[no active session found];');
-            content = {'body': 'Not logged in.'};
-            views.viewHome(response, content); 
+            var content = {'body': 'Not logged in.'};
+            views.viewHome(response, viewContext); 
          }
-      });
+      }
+   );
 };
 
 
 var allUsers = function(request, response) { 
    dprint('#y[[C]];--allUsers controller');
-
-   users.getAllUsers(function(users) {
-      views.viewAllUsers(response, users);
+   var viewContext = { };
+   users.getAllUsers(function(allUsers) {
+      viewContext.allUsers = allUsers;
+      users.validateLogin(request, function(isValid) {
+         if (isValid) {
+            users.getUser(request.cookies.username, function(user) {
+               viewContext.user = user;
+               viewContext.loggedin = true;
+               views.viewAllUsers(response, viewContext);
+            });
+         }
+         else {
+            viewContext.loggedin = false;
+            views.viewAllUsers(response, viewContext);
+         }
+      });
    });
 };
 
 
-var notFound = function(request, response) { 
+var notFound = function(request, response, path) { 
    dprint('#y[[C]];--Not found controller');
-   views.viewPageNotFound(response); 
+   var viewContext = { 'path' : path };
+   users.getUser(request.cookies.username, function(user) {
+      viewContext.user = user;
+      viewContext.loggedin = true;
+      views.viewPageNotFound(response, viewContext);
+   });
 };
 
 
@@ -58,8 +81,7 @@ var image = function(request, response, name) {
    var file = fs.readFileSync('static/images/' + name);
    //response.writeHead(200, {'Content-Type' : 'bb' + type});
    response.end(file);
-   
-}
+};
 
 
 var signup = function(request, response) {
@@ -93,29 +115,72 @@ var login = function(request, response) {
             if (res) {
                dprint('#g[[C]];--LOGIN SUCCESS!!');
                sessions.createSession(response, fields.username, 
-                  function(username, key) {
-                     request.cookies.sessionkey = key;
-                     request.cookies.username = username;
-                     home(request, response);
-               });
+                  () => response.redirect('/'));
             }
             else { 
                dprint('#g[[C]]; #r[Login Unsuccessful :(];');
+               response.redirect('/404');
+
                notFound(request, response);
             }
-         }) 
+         }); 
       });
-   }
-}
+   };
+};
 
 
 var logout = function(request, response) {
+   var user = request.cookies.username || null;
+   users.logout(response, user, (() => {
+      response.redirect('/');
+      //allUsers(request, response);
+   }));
+};
 
-   sessions.removeSession(request.cookies.username);
+
+var allPosts = function(request, response) {
+   var sessionKey = request.cookies.sessionkey || null;
+   var username = request.cookies.username || null;
+   var viewContext = { };
+
+   sessions.validateSession(username, sessionKey, 
+      function (isValidated) {
+         if (isValidated) {
+            users.getUser(username, function(user) {
+               viewContext.user = user;
+               viewContext.loggedin = true;
+               users.getAllPosts(function(posts) {
+                  viewContext.posts = posts;
+                  views.viewAllPosts(response, viewContext); 
+               });
+            });
+         }
+         else {
+            views.viewAllPosts(response, viewContext); 
+         }
+      }
+   );
+};
 
 
-   
-}
+var submitPost = function(request, response) {
+   if (request.method !== 'POST') throw new Error('Method is not POST.');
+   var form = new formidable.IncomingForm();
+   form.parse(request, function(err, fields) {
+      if (err) throw err;
+      var post = {
+         'text': fields.postContent,
+         'username': request.cookies.username,
+         'date': new Date(),
+      };
+      users.submitPost(request, post, function() {
+         console.log('redirectiong to /posts');
+
+         response.redirect('/posts');
+         //allPosts(request, response);
+      });
+   });
+};
 
 
 exports.home = home;
@@ -125,3 +190,6 @@ exports.static = static;
 exports.image = image;
 exports.signup = signup;
 exports.login = login;
+exports.logout = logout;
+exports.allPosts = allPosts;
+exports.submitPost = submitPost;
