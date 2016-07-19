@@ -3,7 +3,7 @@ var db = new sql.Database('database.db');
 var rand = require('csprng');
 
 
-var createSession = function(response, username, cb) {
+function createSession(res, username, cb) {
    var sessionKey = username + rand(160, 36);
    db.serialize(function() {
       db.run('\
@@ -18,7 +18,7 @@ var createSession = function(response, username, cb) {
          ]
       );
 
-      response.setCookie({
+      res.setCookie({
          'sessionkey': { 
             'val': sessionKey,
             'life': 60000 * 24,
@@ -35,7 +35,7 @@ var createSession = function(response, username, cb) {
 }
 
 
-var validateSession  = function(username, token, cb) {
+function validateSession(username, token, cb) {
    dprint('#y[[S]]; Validating session... ');
    if (username && token) { 
       db.get('\
@@ -64,7 +64,7 @@ var validateSession  = function(username, token, cb) {
 }
 
 
-var removeSession = function(response, username, cb) {
+function removeSession(res, username, cb) {
    db.serialize(function() {
 
       db.run('\
@@ -72,7 +72,7 @@ var removeSession = function(response, username, cb) {
          WHERE username=\'' + username +'\';' 
       );
 
-      response.setCookie({
+      res.setCookie({
          'sessionkey': { 
             'val': 'null',
             'life': 0,

@@ -8,10 +8,10 @@ var fs = require('fs');
 var formidable = require('formidable');
 
 
-var home = function(request, response) { 
+function home(req, res) {
    dprint('#y[[C]]; home controller');
-   var sessionKey = request.cookies.sessionkey || null;
-   var username = request.cookies.username || null;
+   var sessionKey = req.cookies.sessionkey || null;
+   var username = req.cookies.username || null;
    var viewContext = { };
 
    sessions.validateSession(username, sessionKey, 
@@ -22,106 +22,120 @@ var home = function(request, response) {
                var content = {'body': 'LOGGED IN!!!! Welcome, ' + user.firstName};
                viewContext.user = user;
                viewContext.loggedin = true;
-               views.viewHome(response, viewContext); 
+               views.viewHome(res, viewContext); 
             });
          }
          else {
             print('#y[[C]]; home #r[no active session found];');
             var content = {'body': 'Not logged in.'};
-            views.viewHome(response, viewContext); 
+            views.viewHome(res, viewContext); 
          }
       }
    );
 };
 
 
-var allUsers = function(request, response) { 
+function allUsers(req, res) {
    dprint('#y[[C]];--allUsers controller');
    var viewContext = { };
    users.getAllUsers(function(allUsers) {
       viewContext.allUsers = allUsers;
-      users.validateLogin(request, function(isValid) {
+      users.validateLogin(req, function(isValid) {
          if (isValid) {
-            users.getUser(request.cookies.username, function(user) {
+            users.getUser(req.cookies.username, function(user) {
                viewContext.user = user;
                viewContext.loggedin = true;
-               views.viewAllUsers(response, viewContext);
+               views.viewAllUsers(res, viewContext);
             });
          }
          else {
             viewContext.loggedin = false;
-            views.viewAllUsers(response, viewContext);
+            views.viewAllUsers(res, viewContext);
          }
       });
    });
 };
 
 
-var notFound = function(request, response, path) { 
+function deleteUser(req, res, username) {
+   console.log(username);
+   users.deleteUser(username, () => res.redirect('/users/all'));
+}
+
+
+function notFound(req, res, path) {
    dprint('#y[[C]];--Not found controller');
    var viewContext = { 'path' : path };
-   users.getUser(request.cookies.username, function(user) {
+   users.getUser(req.cookies.username, function(user) {
       viewContext.user = user;
       viewContext.loggedin = true;
-      views.viewPageNotFound(response, viewContext);
+      views.viewPageNotFound(res, viewContext);
    });
 };
 
 
-var static = function(request, response, type, name) {
-   dprint('#y[[C]];--Loading static #b[' + type + ']; file: #b[' + name + '];');
-   var file = fs.readFileSync('static/' + type + '/' + name);
-   response.writeHead(200, {'Content-Type' : 'text/' + type});
-   response.end(file);
+function static(req, res, args) {
+   var type = args[0];
+   var fname = args[1];
+   dprint('#y[[C]];--Loading static #b[' + type + ']; file: #b[' + fname + '];');
+   var file = fs.readFileSync('static/' + type + '/' + fname);
+   res.writeHead(200, {'Content-Type' : 'text/' + type});
+   res.end(file);
 };
 
 
-var image = function(request, response, name) {
+function image(req, res, name) {
    dprint('#y[[C]];--Loading image: #b[' + name + '];');
    var file = fs.readFileSync('static/images/' + name);
-   //response.writeHead(200, {'Content-Type' : 'bb' + type});
-   response.end(file);
+   //res.writeHead(200, {'Content-Type' : 'bb' + type});
+   res.end(file);
 };
 
 
-var signup = function(request, response) {
+function signup(req, res) {
    dprint('#y[[C]];--signup controller');
-   if (request.method === 'GET')
-      views.viewSignup(response);
-   else if (request.method === 'POST') {
+   if (req.method === 'GET')
+      views.viewSignup(res);
+   else if (req.method === 'POST') {
       var form = new formidable.IncomingForm();
 
       eventEmitter.on('dbAddUserFinished', function() {
-         allUsers(request, response);
+         allUsers(req, res);
       });
 
-      form.parse(request, function(err, fields) {
+      form.uploadDir = 'static/images/';
+      form.parse(req, function(err, fields, files) {
+         if (err) throw err;
+         console.log('profilePicture.name: ' + files.profilePicture.name);
+         console.log('profilePicture.path: ' + files.profilePicture.path);
+         console.log('form.uploadDir: ' + form.uploadDir);
+         fs.renameSync(files.profilePicture.path,  
+            'static/images/' + files.profilePicture.name);
+         fields.profilePicture = files.profilePicture.name;
          users.addUser(fields, eventEmitter);
       });
    };
 };
 
 
-var login = function(request, response) {
-   if (request.method === 'GET') {
-      views.viewLogin(response);
-   }
-   else if (request.method === 'POST') {
+function login(req, res) {
+   if (req.method === 'GET')
+      views.viewLogin(res);
+   else if (req.method === 'POST') {
       var form = new formidable.IncomingForm();
-
-      form.parse(request, function(err, fields) {
+      form.parse(req, function(err, fields) {
          dprint('#g[[C]];--Authenticating...');
-         users.login(fields.username, fields.password, function(res) {
-            if (res) {
+         users.login(fields.username, fields.password, function(err, resault) {
+            if (err) throw err;
+
+            if (resault) {
                dprint('#g[[C]];--LOGIN SUCCESS!!');
-               sessions.createSession(response, fields.username, 
-                  () => response.redirect('/'));
+               sessions.createSession(res, fields.username, 
+                  () => res.redirect('/'));
             }
             else { 
                dprint('#g[[C]]; #r[Login Unsuccessful :(];');
-               response.redirect('/404');
-
-               notFound(request, response);
+               res.redirect('/404');
             }
          }); 
       });
@@ -129,18 +143,15 @@ var login = function(request, response) {
 };
 
 
-var logout = function(request, response) {
-   var user = request.cookies.username || null;
-   users.logout(response, user, (() => {
-      response.redirect('/');
-      //allUsers(request, response);
-   }));
+function logout(req, res) {
+   var user = req.cookies.username || null;
+   users.logout(res, user, () => res.redirect('/users/all'));
 };
 
 
-var allPosts = function(request, response) {
-   var sessionKey = request.cookies.sessionkey || null;
-   var username = request.cookies.username || null;
+function allPosts(req, res) {
+   var sessionKey = req.cookies.sessionkey || null;
+   var username = req.cookies.username || null;
    var viewContext = { };
 
    sessions.validateSession(username, sessionKey, 
@@ -151,33 +162,33 @@ var allPosts = function(request, response) {
                viewContext.loggedin = true;
                users.getAllPosts(function(posts) {
                   viewContext.posts = posts;
-                  views.viewAllPosts(response, viewContext); 
+                  views.viewAllPosts(res, viewContext); 
                });
             });
          }
          else {
-            views.viewAllPosts(response, viewContext); 
+            views.viewAllPosts(res, viewContext); 
          }
       }
    );
 };
 
 
-var submitPost = function(request, response) {
-   if (request.method !== 'POST') throw new Error('Method is not POST.');
+function submitPost(req, res) {
+   if (req.method !== 'POST') throw new Error('Method is not POST.');
    var form = new formidable.IncomingForm();
-   form.parse(request, function(err, fields) {
+   form.parse(req, function(err, fields) {
       if (err) throw err;
       var post = {
          'text': fields.postContent,
-         'username': request.cookies.username,
+         'username': req.cookies.username,
          'date': new Date(),
       };
-      users.submitPost(request, post, function() {
+      users.submitPost(req, post, function() {
          console.log('redirectiong to /posts');
 
-         response.redirect('/posts');
-         //allPosts(request, response);
+         res.redirect('/posts');
+         //allPosts(req, res);
       });
    });
 };
@@ -193,3 +204,4 @@ exports.login = login;
 exports.logout = logout;
 exports.allPosts = allPosts;
 exports.submitPost = submitPost;
+exports.deleteUser = deleteUser;

@@ -3,7 +3,7 @@ var fs = require('fs');
 var mustache = require('mustache');
 
 
-var viewHome = function(response, data) {
+function viewHome(res, data) {
    dprint('#y[[V]];---Running view.getHome()');
    var base = fs.readFileSync('static/views/base_template.html').toString();
    var view = { };
@@ -19,13 +19,13 @@ var viewHome = function(response, data) {
       navbar: nav,
       main_content: fs.readFileSync('static/views/index.html').toString(),
    });
-   response.writeHead(200, { 'Content-Type' : 'text/html' });
-   response.write(output);
-   response.end();
+   res.writeHead(200, { 'Content-Type' : 'text/html' });
+   res.write(output);
+   res.end();
 };
 
 
-var viewPageNotFound = function(response, data) {
+function viewPageNotFound(res, data) {
    dprint('#r[[V]];---Serving 404 page.];');
    var base = fs.readFileSync('static/views/base_template.html').toString();
    var nav = fs.readFileSync('static/views/navbar_template.html').toString();
@@ -41,12 +41,12 @@ var viewPageNotFound = function(response, data) {
       navbar: nav,
       main_content: content 
    });
-   response.writeHead(404, { 'Content-type' : 'text/html' });
-   response.end(output);
+   res.writeHead(404, { 'Content-type' : 'text/html' });
+   res.end(output);
 };
 
 
-var viewSignup = function(response, data) {
+function viewSignup(res, data) {
    dprint('#y[[V]];---Serving signup page.');
    var base = fs.readFileSync('static/views/base_template.html').toString();
    var nav = '';
@@ -63,12 +63,12 @@ var viewSignup = function(response, data) {
       navbar: nav,
       main_content: content, 
    });
-   response.writeHead(200, {'Content-Type' : 'text/html'});
-   response.end(output);
+   res.writeHead(200, {'Content-Type' : 'text/html'});
+   res.end(output);
 };
 
 
-var viewAllUsers = function(response, data) {
+function viewAllUsers(res, data) {
    dprint('#y[[V]];---Serving allUsers page.');
    var base = fs.readFileSync('static/views/base_template.html').toString();
    var view = { users: data.allUsers };
@@ -85,12 +85,12 @@ var viewAllUsers = function(response, data) {
       navbar: nav,
       main_content: content,
    });
-   response.writeHead(200, {'Content-Type' : 'text/html'});
-   response.end(output);
+   res.writeHead(200, {'Content-Type' : 'text/html'});
+   res.end(output);
 }
 
 
-var viewLogin = function(response, data) {
+function viewLogin(res, data) {
    dprint('#y[[V]];---Serving login page.');
    var base = fs.readFileSync('static/views/base_template.html').toString();
    var view = { };
@@ -107,12 +107,12 @@ var viewLogin = function(response, data) {
       navbar: nav,
       main_content: content, 
    });
-   response.writeHead(200, {'Content-Type' : 'text/html'});
-   response.end(output);
+   res.writeHead(200, {'Content-Type' : 'text/html'});
+   res.end(output);
 }
 
 
-viewAllPosts = function(response, data) {
+function viewAllPosts(res, data) {
    dprint('#y[[V]]; Serving all posts page.');
    var base = fs.readFileSync('static/views/base_template.html').toString();
    var view = { posts: data.posts };
@@ -129,8 +129,8 @@ viewAllPosts = function(response, data) {
       navbar: nav,
       main_content: content, 
    });
-   response.writeHead(200, {'Content-Type' : 'text/html'});
-   response.end(output);
+   res.writeHead(200, {'Content-Type' : 'text/html'});
+   res.end(output);
 
    
 }

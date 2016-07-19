@@ -3,8 +3,9 @@ var sql =  require('sqlite3').verbose();
 var db = new sql.Database('database.db'); 
 var sessions = require('./sessions');
 
-var addUser = function(fields, eventEmitter) {
+function addUser(fields, eventEmitter) {
    dprint('#y[[M]];  Adding new user');
+   console.log('USER PROF PIC URL: ' + fields.profilePicture);
    var user = {
       username : fields.username,
       firstName : fields.firstName,
@@ -33,7 +34,7 @@ var addUser = function(fields, eventEmitter) {
 };
 
 
-var login = function(name, password, cb) {
+function login(name, password, cb) {
    dprint('#y[[U]];  Authenticating...');
    db.get('SELECT firstName, password FROM users WHERE username = \'' + 
       name + '\'', 
@@ -42,32 +43,37 @@ var login = function(name, password, cb) {
          dprint('#y[[U]];  .firstname. = ' + row.firstName);
          var hash = row.password.toString();
          dprint('#y[[U]];  .password. = ' + hash);
-         bcrypt.compare(password, hash, function(err, res) {
-            cb(res);
-         });
+         bcrypt.compare(password, hash, cb);
       }
    );
 };
 
 
-var logout = function(response, username, cb) {
+
+function logout(res, username, cb) {
    if (username === null) {
       dprint('#r[[err]];  No username provied to logout');
       return
    }
    dprint('#y[[U]];  Logging out...');
-   sessions.removeSession(response, username, cb);
+   sessions.removeSession(res, username, cb);
+};
+
+function deleteUser(username, cb) {
+   console.log('Deleting %s from database', username);
+   cpr('g[Deleting ' + username + ' from database]');
+   db.run('\ DELETE FROM users WHERE username=(?)', username, cb);
 };
 
 
-var getAllUsers = function(callback) {
+function getAllUsers(callback) {
    db.all('SELECT * FROM users', function(err, rows) {
       callback(rows);
    });
 };
 
 
-var getUser = function(username, callback) {
+function getUser(username, callback) {
    db.get('SELECT * FROM users WHERE username=\'' + username + '\'', 
       function(err, row) {
          callback(row);
@@ -76,9 +82,9 @@ var getUser = function(username, callback) {
 };
 
 
-var validateLogin = function(request, cb) {
-   var user = request.cookies.username || null; 
-   var sessionKey = request.cookies.sessionkey || null;
+function validateLogin(req, cb) {
+   var user = req.cookies.username || null; 
+   var sessionKey = req.cookies.sessionkey || null;
    if (user && sessionKey) {
       sessions.validateSession(user, sessionKey, function(isValid) {
          cb(isValid);
@@ -88,9 +94,9 @@ var validateLogin = function(request, cb) {
       cb(false);
 };
 
-var submitPost = function(request, post, cb) {
+function submitPost(req, post, cb) {
    dprint('#y[[U]]; Submitting post');
-   var user = request.cookies.username || null;
+   var user = req.cookies.username || null;
    if (user === null) throw new Error('User cannot be null to post');
 
    db.run('\
@@ -113,18 +119,15 @@ var submitPost = function(request, post, cb) {
 
 };
 
-var getAllPosts = function(cb) {
+function getAllPosts(cb) {
    db.all('\
       SELECT * FROM posts \
-      JOIN users ON users.username = posts.username;'
+      JOIN users ON users.username = posts.username\
+      ORDER by posts.postID DESC;'
    , function(err, data) {
          cb(data);
-      
    });
-
-   
-}
-
+};
 
 
 
@@ -136,5 +139,6 @@ exports.logout = logout;
 exports.validateLogin = validateLogin;
 exports.submitPost = submitPost;
 exports.getAllPosts = getAllPosts;
+exports.deleteUser = deleteUser;
 
 

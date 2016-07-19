@@ -1,47 +1,76 @@
 
 var http = require('http');
-var route = require('./router').router;
+var route = require('./router').route;
 var utils = require('./utils');
 var models = require('./models');
 var views = require('./views');
 var cookies =  require('./cookies');
+var sessions = require('./sessions');
+
 
 global.print = utils.print;
 global.dprint = utils.dprint;
-dprint.debug = true;
-
-models.initDB();
-
-
-http.createServer(function(request, response) {
-
-   //sessions.validateSession(request);
-
-   request.cookies = cookies.parseCookies(request);
-   response.cookies = cookies.parseCookies(request);
-   response.setCookie = cookies.responseSetCookie;
-   response.removeCookie = cookies.responseRemoveCookie;
-   response.redirect = utils.redirectURL;
+global.cpr = utils.cprint;
+dprint.debug = false;
 
 
-   route(request, response);
+
+
+http.createServer(function(req, res) {
+
+
+   models.initDB(() => {
+
+      examineRequest(req, res);  
+      prepResponse(req, res);  
+      route(req, res);
+   });
+
 
    
 }).listen(8000);
 
 
-var staticFiles = {
-   'main.css': 1,
-   'nav.css': 1, 
-   'main.js': 1,
-};
+
+function examineRequest(req, res) {
+
+   res.user = { 
+      name: 'guest', 
+   };
 
 
-var images = {
-   'user-default.png': 1,
-   'athena.png': 1,
-   'burritocat.jpg': 1,
-   'businesscat.jpeg': 1,
-   'nyancat.png': 1,
-   'me.jpg': 1,
-};
+   cookies.parseCookies(req);
+
+
+
+   if (req.method === 'POST') {
+      // SCAN FORM DATA
+   } 
+
+
+   //sessions.validateSession(req);
+   res.cookies = cookies.parseCookies(req);
+   res.setCookie = cookies.responseSetCookie;
+   res.removeCookie = cookies.responseRemoveCookie;
+   res.redirect = utils.redirectURL;
+
+   
+}
+
+   /*   read all cookies
+    *     ---> if user has a session cookie
+    *     ------> validate session key
+    *     ---------> give user object to res 
+    *
+    *
+    *   if there's incoming POST data
+    *     ---> read data and give to res object
+    *
+    **/
+
+
+
+
+// TODO: Give response a context object to track things
+//       such as active user and their status level (user/admin/guest/etc), 
+//       session status, etc.

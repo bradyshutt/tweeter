@@ -3,7 +3,7 @@ var sql = require('sqlite3').verbose();
 var db = new sql.Database('database.db'); 
 //var formidable = require('formidable');
 
-var initDB = function() {
+function initDB(cb) {
    dprint('#y[[M]];  Opening Database');
    db.serialize(function() {
       db.run('PRAGMA foreign_keys = ON');
@@ -33,10 +33,11 @@ var initDB = function() {
          FOREIGN KEY(username) REFERENCES users(username))'
       );
 
+      cb();
    });
 };
 
-var closeDB = function() {
+function closeDB() {
    dprint('#y[[M]];  Closing Database');
    db.close(function(err) { if (err) throw err });
 };

@@ -8,13 +8,44 @@ Array.prototype.contains = function(val) {
 }
 
 
-var redirectURL = function(url) {
+function redirectURL(url) {
    this.writeHead(302, {'Location': url});
    this.end();
 }
 
+function atLeast(size) {
+   var newString = this.toString();
+   while (newString.length < size)
+      newString += ' ';
+   return newString;
+}
 
-var print = function(str) {
+
+//String.tabs(<size>);
+function tabs(size) {
+   var idx = 0, x;
+   var newString = '';
+   for (; idx < this.length; x = ++idx) 
+      if (this[idx] === '\t')
+         do newString += ' ';
+         while (x++ % size);
+      else
+         newString += this[idx];
+   return newString;
+}
+
+function cprint(str) {
+   str = str.replace(/r\[/g, '\x1B[31m');
+   str = str.replace(/g\[/g, '\x1B[32m');
+   str = str.replace(/y\[/g, '\x1B[33m');
+   str = str.replace(/b\[/g, '\x1B[34m');
+   str = str.replace(/c\[/g, '\x1B[36m');
+   str = str.replace(/m\[/g, '\x1B[35m');
+   str = str.replace(/\]/g, '\x1B[0m');
+   console.log(str);
+}
+
+function print(str) {
    str = str.replace(/\#r\[/g, '\x1B[31m');
    str = str.replace(/\#g\[/g, '\x1B[32m');
    str = str.replace(/\#y\[/g, '\x1B[33m');
@@ -25,7 +56,7 @@ var print = function(str) {
    console.log(str);
 }
 
-var dprint = function(str) {
+function dprint(str) {
    if (dprint.debug) {
       str = str.replace(/\#r\[/g, '\x1B[31m');
       str = str.replace(/\#g\[/g, '\x1B[32m');
@@ -64,5 +95,8 @@ dprint.debug = false;
 exports.print = print;
 exports.dprint = dprint;
 exports.redirectURL = redirectURL;
+exports.cprint = cprint;
+exports.tabs = tabs;
+exports.atLeast = atLeast;
 
 

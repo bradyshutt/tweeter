@@ -1,10 +1,10 @@
 
 //usage: 
-//   response.cookies = cookies.parseCookies(request);
-//   response.setCookie = cookies.responseSetCookie;
-//   response.removeCookie = cookies.responseRemoveCookie;
+//   res.cookies = cookies.parseCookies(req);
+//   res.setCookie = cookies.responseSetCookie;
+//   res.removeCookie = cookies.responseRemoveCookie;
 //
-//   response.setCookie({
+//   res.setCookie({
 //      'age' : {
 //         val: 69, 
 //         exp: new Date(new Date().getTime() + 5000).toUTCString(),
@@ -13,30 +13,30 @@
 //   });
 
 
-var parseCookies = function(req) {
-   var cookies = { };
+function parseCookies(req) {
+   req.cookies = req.cookies || { };
    if (req.headers.cookie) {
       req.headers.cookie.split(';').forEach(function(cookie) {
          var arr = cookie.split('=');
          var key = arr[0].trim();
          var val = arr[1].trim();
-         cookies[cookie.split('=')[0].trim()] = val; 
+         req.cookies[key] = val; 
       });
    }
    return cookies;
-}
+};
 
 
-var setCookie = function(response, cookiesObj) {
-   var cookies = response.cookies || { };
+function setCookie(res, cookiesObj) {
+   var cookies = res.cookies || { };
    for (var name in cookiesObj) {
       cookies[name] = cookiesObj[name];  
    }
-   response.setHeader('Set-Cookie', toCookieArray(cookies));
-}
+   res.setHeader('Set-Cookie', toCookieArray(cookies));
+};
 
 
-var toCookieArray = function(cookiesObj) {
+function toCookieArray(cookiesObj) {
    var cookies = [];
    for (var name in cookiesObj) {
       var cookie = name + '=';
@@ -64,32 +64,32 @@ var toCookieArray = function(cookiesObj) {
       cookies.push(cookie);
    }
    return cookies;
-}
+};
 
 
-var removeCookie = function(response, name) {
-   var cookies = response.cookies || { };
+function removeCookie(res, name) {
+   var cookies = res.cookies || { };
    cookies[name] = 'null ; expires=' + new Date().toUTCString();
-   response.setHeader('Set-Cookie', toCookieArray(cookies));
-}
+   res.setHeader('Set-Cookie', toCookieArray(cookies));
+};
 
 
-var responseSetCookie = function(cookiesObj) {
+function responseSetCookie(cookiesObj) {
    var cookies = this.cookies || { };
    for (var name in cookiesObj) {
       cookies[name] = cookiesObj[name];  
    }
    this.setHeader('Set-Cookie', toCookieArray(cookies));
-}
+};
 
 
-var responseRemoveCookie = function(cookiesObj) {
+function responseRemoveCookie(cookiesObj) {
    var cookies = this.cookies || { };
    for (var name in cookiesObj) {
       cookies[name] = cookiesObj[name];  
    }
    this.setHeader('Set-Cookie', toCookieArray(cookies));
-}
+};
 
 
 exports.parseCookies = parseCookies;

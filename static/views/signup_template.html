@@ -5,13 +5,13 @@
 
    <div class="form">
        
-      <form action="/signup/submit" method="post">
+      <form action="/users/signup" method="post" enctype="multipart/form-data">
 
          First Name: <input type="text" name="firstName"> </input> <br>
          Last Name: <input type="text" name="lastName"> </input> <br>
          Username: <input type="text" name="username"> </input> <br>
          E-mail: <input type="text" name="email"> </input> <br>
-         Profile Pic: <input type="text" name="profilePicture"> </input> <br>
+         Profile Pic: <input type="file" name="profilePicture"> </input> <br>
          Password: <input type="password" name="password"> </input> <br>
          Gender: <br>
             <input type="radio" name="gender" value="male" checked>Male<br>
