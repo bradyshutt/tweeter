@@ -1,3 +1,6 @@
+/* TODO: all err arg to all callbacks to adhere to standards */
+/* TODO: change all '//' comments to '/*' ones */
+
 var http = require('http')
 var utils = require('./utils')
 var models = require('./models')
@@ -9,62 +12,42 @@ global.print = utils.print
 global.dprint = utils.dprint
 global.cpr = utils.cprint
 
-// var foo = new Promise((resolve, reject) => {
-//   resolve()
-// })
-// 
-// foo.then((resolve) => console.log(resolve))
-
 http.createServer(function (req, res) {
-  cpr('')
-  cpr('Recieved request for: y[' + req.url + ' ]')
 
-
-  /* If requesting a static file, skip db initialization
-   * and request examination. Just serve the static file. */
-  if (req.url.match(/^\/static\//)) route(req, res)
-  else {
-    models.initDB(() => {
-      examineRequest(req, res)
-      cpr('User is ' + (req.validated ? 'g[' : 'r[not ') + 'logged in.]')
-      route(req, res)
+  /* If requesting a static file, skip cookie parsing,
+   * db initialization, and session validation */
+  if ((/^\/static\//).test(req.url) ||  (/^\/images\//).test(req.url)) { 
+    cpr('Recieved request for asset: y[' + req.url + ' ]')
+    route(req, res) 
+  } else {
+    cpr('')
+    cpr('Recieved request for URL: y[' + req.url + ' ]')
+    examineRequest(req, res, () => {
+      models.initDB(() => {
+        cpr('User is ' + (req.validated ? 'g[' : 'r[not ') + 'logged in.]')
+        route(req, res)
+      })
     })
   }
+
 }).listen(8000)
 
-function examineRequest (req, res) {
+function examineRequest (req, res, cb) {
   res.cookies = cookies.parseCookies(req)
   res.setCookie = cookies.responseSetCookie
   res.removeCookie = cookies.responseRemoveCookie
   res.redirect = utils.redirectURL
-  req.validated = false
 
-  if ((req.username = req.cookies['username']) || null) {
+  if ((req.username = req.cookies['username'] || null)) {
     if (req.cookies['sessionkey']) {
-      users.validateSession(req, function (isValid) {
-        if (isValid) req.validated = true
-        else req.validated = false
-        console.log(req.validated)
+      users.validateSession(req, (err, isValid) => { 
+        req.validated = isValid 
+        cb();
       })
     }
   }
 
-  if (req.method === 'POST') {
-    // SCAN FORM DATA
-  }
+  if (req.method === 'POST') { /* TODO: SCAN FORM DATA */  }
+
 }
 
-/*   read all cookies
- *     ---> if user has a session cookie
- *     ------> validate session key
- *     ---------> give user object to res
- *
- *
- *   if there's incoming POST data
- *     ---> read data and give to res object
- *
- **/
-
-// TODO: Give response a context object to track things
-//       such as active user and their status level (user/admin/guest/etc),
-//       session status, etc.

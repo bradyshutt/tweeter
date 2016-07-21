@@ -3,7 +3,7 @@ var fs = require('fs')
 var mustache = require('mustache')
 
 function viewHome (res, data) {
-  cpr('Responding with b[view.getHome()]')
+  cpr('y[---->] Responding with b[view.getHome()]')
   var base = fs.readFileSync('static/views/base_template.html').toString()
   var view = { }
   var nav = ''
@@ -24,7 +24,7 @@ function viewHome (res, data) {
 }
 
 function viewPageNotFound (res, data) {
-  cpr('b[Serving 404 page.]')
+  cpr('y[---->]b[Serving 404 page.]')
   var base = fs.readFileSync('static/views/base_template.html').toString()
   var nav = fs.readFileSync('static/views/navbar_template.html').toString()
   var view = { }
@@ -66,7 +66,7 @@ function viewSignup (res, data) {
 }
 
 function viewAllUsers (res, data) {
-  cpr('lm[Serving allUsers page.]')
+  cpr('m[Serving allUsers page.]')
   var base = fs.readFileSync('static/views/base_template.html').toString()
   var view = { users: data.allUsers }
   var nav = ''

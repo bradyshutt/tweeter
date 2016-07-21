@@ -27,12 +27,37 @@ function login (name, password, cb) {
   cpr('m[Authenticating login for ' + name + ']')
   db.get('SELECT password FROM users WHERE username=\'' + name + '\''
   , function (err, row) {
-    if (err) throw err
+    if (err) { throw err }
     var hash = row.password.toString()
-    bcrypt.compare(password, hash, function (err, ans) {
-      if (err) throw err
-      cb(ans)
+    bcrypt.compare(password, hash, function (err, success) {
+      if (err) { throw err }
+      cb(success)
     })
+  })
+}
+
+function createSession (req, res, cb) {
+  cpr('c[Creating a new session for ' + req.username + ']')
+  var sessionKey = req.username + rand(160, 36)
+
+  db.serialize(function () {
+    db.run('DELETE FROM sessions WHERE username=\'' + req.username + '\'')
+
+    db.run('INSERT INTO sessions VALUES (?, ?)', req.username, sessionKey)
+
+    res.setCookie({
+      'sessionkey': {
+        'val': sessionKey,
+        'life': 60000 * 24,
+        'path': '/'
+      },
+      'username': {
+        'val': req.username,
+        'life': 60000 * 24,
+        'path': '/'
+      }
+    })
+    cb()
   })
 }
 
@@ -69,51 +94,27 @@ function validateSession (req, cb) {
   var sessionKey = req.cookies.sessionkey
   if (user && sessionKey) {
     db.get(
-      'SELECT * FROM sessions' +
-      'JOIN users ON users.username = sessions.username' +
+      'SELECT * FROM sessions ' +
+      'JOIN users ON users.username = sessions.username ' +
       'WHERE users.username = \'' + req.username + '\''
     , function (err, row) {
-      if (err) throw err
+      if (err) { throw err }
       if (row === undefined || row.sessionKey !== sessionKey) {
         cpr('r[Session validation failed.]')
-        cb(false)
+        cb(null, false)
       } else if (row.sessionKey === sessionKey) {
         cpr('g[Session validation success!]')
-        cb(true)
+        cb(null, true)
       }
     })
-  } else cb(false)
+  } else cb(err, false)
 }
 
-function createSession (req, res, cb) {
-  cpr('c[Creating a new session for ' + req.username + ']')
-  var sessionKey = req.username + rand(160, 36)
-
-  db.serialize(function () {
-    db.run('DELETE FROM sessions WHERE username=\'' + req.username + '\'')
-
-    db.run('INSERT INTO sessions VALUES (?, ?)', req.username, sessionKey)
-
-    res.setCookie({
-      'sessionkey': {
-        'val': sessionKey,
-        'life': 60000 * 24,
-        'path': '/'
-      },
-      'username': {
-        'val': req.username,
-        'life': 60000 * 24,
-        'path': '/'
-      }
-    })
-    cb()
-  })
-}
 
 function removeSession (res, username, cb) {
   db.serialize(function () {
     db.run(
-      'DELETE FROM sessions' +
+      'DELETE FROM sessions ' +
       'WHERE username=\'' + username + '\''
     )
 

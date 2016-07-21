@@ -22,7 +22,7 @@ addRoute('GET', [ /^\/login$/, /^\/users\/login$/ ], controllers.login)
 addRoute('POST', /^\/users\/login$/, controllers.login)
 
 // USER LOG OUT
-addRoute('GET', [ /^\/logout/, /^\/users\/logout/ ], controllers.logout)
+addRoute('GET', [ /^\/logout$/, /^\/users\/logout/ ], controllers.logout)
 
 // REQUEST A USERS PROFILE
 addRoute('GET', /^\/users\/u\/([^\/]+)$/, function (req, res, args) {
@@ -35,7 +35,7 @@ addRoute('GET', /^\/users\/delete\/([^\/]+)$/, (req, res, un) => {
 })
 
 // REQUEST ALL POSTS
-addRoute('GET', [ /^\/posts/, /^\/posts\/all$/ ], controllers.allPosts)
+addRoute('GET', [ /^\/posts$/, /^\/posts\/all$/ ], controllers.allPosts)
 
 // REQUEST STATIC FILE
 addRoute('GET', /^\/static\/([^\/]+)\/([^\/]+)$/, controllers.staticFile)
@@ -63,21 +63,25 @@ function addRoute (method, regexURL, func) {
 
 function searchRoutes (req, res) {
   var matches
-  routes.forEach(function (route) {
+  var numRoutes = routes.length;
 
-    // Saves regex matches obj to 'matches'
+  routes.forEach(function (route) {
+    /* Saves regex matches obj to 'matches' */
     if (route.method === req.method &&
       (matches = req.url.match(route.pattern))) {
-
-      // push capture groups from regex obj to 'captures'
-      // and send to the route's callback function
+      /* Send captured groups to the route's callback */
       var captures = [ ]
       for (var idx = 1; matches[idx]; ++idx) captures.push(matches[idx])
       route.cb(req, res, captures)
       return
+
+
     }
+
+    if (--numRoutes) controllers.notFound(req, res)
   })
 }
+
 
 
 exports.route = searchRoutes

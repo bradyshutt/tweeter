@@ -54,14 +54,14 @@ function notFound (req, res, path) {
 function staticFile (req, res, args) {
   var type = args[0]
   var fname = args[1]
-  cpr('Responding with file: c[' + fname + ']')
+  cpr('y[---->] Responding with file: c[' + fname + ']')
   var file = fs.readFileSync('static/' + type + '/' + fname)
   res.writeHead(200, {'Content-Type': 'text/' + type})
   res.end(file)
 }
 
 function image (req, res, name) {
-  cpr('c[Serving image: ' + name + ']')
+  cpr('y[---->] Responding with image: c[' + name + ']')
   var file = fs.readFileSync('static/images/' + name)
   // res.writeHead(200, {'Content-Type': 'bb' + type})
   res.end(file)
@@ -90,7 +90,6 @@ function login (req, res) {
     var form = new formidable.IncomingForm()
     form.parse(req, function (err, fields) {
       if (err) throw err
-      cpr('m[Authenticating]')
       users.login(fields.username, fields.password, function (resault) {
         if (resault) {
           cpr('g[LOGIN SUCCESS!!]')
