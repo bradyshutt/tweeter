@@ -4,7 +4,7 @@ var db = new sql.Database('database.db')
 // var formidable = require('formidable')
 
 function initDB (cb) {
-  cpr('m[Initializing Database]')
+  cpr.db('Initializing Database')
   db.serialize(function () {
     db.run('PRAGMA foreign_keys = ON')
 

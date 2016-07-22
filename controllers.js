@@ -51,19 +51,40 @@ function notFound (req, res, path) {
   })
 }
 
-function staticFile (req, res, args) {
-  var type = args[0]
-  var fname = args[1]
-  cpr('y[---->] Responding with file: c[' + fname + ']')
+function file (res, cat, type, fname) {
+  if (cat === 'images') {
+    fs.readFile('static/images/' + fname, (err, file) => {
+      if (err) {
+        cpr.err('Image not found.')
+        res.redirect('/images/notFound.png')
+      } else {
+        cpr.out(cat + ' ' + fname)
+        res.writeHeader(200, {'Content-Type': 'image/' + fname.split('.')[1]})
+        res.end(file)
+      }
+    })
+  } else if (cat === 'static') {
+    fs.readFile('static/' + type + '/' + fname, (err, file) => {
+      if (err) throw err
+      else {
+        cpr.out(type + ' ' + fname)
+        res.writeHeader(200, {'Content-Type': 'text/' + type})
+        res.end(file)
+      }
+    })
+  }
+}
+
+function staticFile (res, type, fname) {
+  cpr.out(fname)
   var file = fs.readFileSync('static/' + type + '/' + fname)
   res.writeHead(200, {'Content-Type': 'text/' + type})
   res.end(file)
 }
 
 function image (req, res, name) {
-  cpr('y[---->] Responding with image: c[' + name + ']')
+  cpr.out(name)
   var file = fs.readFileSync('static/images/' + name)
-  // res.writeHead(200, {'Content-Type': 'bb' + type})
   res.end(file)
 }
 
@@ -145,7 +166,8 @@ function submitPost (req, res) {
 exports.home = home
 exports.allUsers = allUsers
 exports.notFound = notFound
-exports.staticFile = staticFile
+exports.static = staticFile
+exports.file = file
 exports.image = image
 exports.signup = signup
 exports.login = login

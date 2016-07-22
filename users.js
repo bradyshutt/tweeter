@@ -92,6 +92,7 @@ function validateSession (req, cb) {
   var user = req.username || new Error('Validating session w/out a u.n.')
   cpr('m[Validating ' + user + '\'s session.]')
   var sessionKey = req.cookies.sessionkey
+
   if (user && sessionKey) {
     db.get(
       'SELECT * FROM sessions ' +
@@ -107,9 +108,8 @@ function validateSession (req, cb) {
         cb(null, true)
       }
     })
-  } else cb(err, false)
+  } else cb(null, false)
 }
-
 
 function removeSession (res, username, cb) {
   db.serialize(function () {

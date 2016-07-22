@@ -1,4 +1,3 @@
-/* global cpr */
 var controllers = require('./controllers.js')
 
 var routes = [ ]
@@ -52,18 +51,19 @@ function addRoute (method, regexURL, func) {
         cb: func
       })
     })
+  } else {
+    var newRoute = {
+      method: method,
+      pattern: regexURL,
+      cb: func
+    }
+    routes.push(newRoute)
   }
-  var newRoute = {
-    method: method,
-    pattern: regexURL,
-    cb: func
-  }
-  routes.push(newRoute)
 }
 
 function searchRoutes (req, res) {
   var matches
-  var numRoutes = routes.length;
+  var routed = false
 
   routes.forEach(function (route) {
     /* Saves regex matches obj to 'matches' */
@@ -71,18 +71,27 @@ function searchRoutes (req, res) {
       (matches = req.url.match(route.pattern))) {
       /* Send captured groups to the route's callback */
       var captures = [ ]
-      for (var idx = 1; matches[idx]; ++idx) captures.push(matches[idx])
+      for (var idx = 1; matches[idx]; ++idx) { captures.push(matches[idx]) }
       route.cb(req, res, captures)
+      routed = true
       return
-
-
     }
-
-    if (--numRoutes) controllers.notFound(req, res)
   })
+  if (!routed) { controllers.notFound(req, res) || { } }
 }
 
-
+function file (req, res) {
+  if (req.method !== 'GET') {
+    throw new Error('Requesting static file with http method:' + req.method)
+  } else {
+    let matches = req.url.match(/^\/([^\/]+)\/?([^\/]+)?\/([^\/]+)$/)
+    let cat = matches[1]
+    let type = matches[2]
+    let file = matches[3]
+    controllers.file(res, cat, type, file)
+  }
+}
 
 exports.route = searchRoutes
+exports.file = file
 

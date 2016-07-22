@@ -13,6 +13,16 @@ function parseCookies (req) {
   }
 }
 
+function parse (req) {
+  req.cookies = req.cookies || { }
+  if (req.headers.cookie) {
+    req.headers.cookie.split(';').forEach(function (cookie) {
+      var split = cookie.split('=')
+      req.cookies[split[0].trim()] = split[1].split(' ')[0].trim()
+    })
+  }
+}
+
 function setCookie (res, cookiesObj) {
   var cookies = res.cookies || { }
   for (var name in cookiesObj) {
@@ -69,6 +79,7 @@ function responseRemoveCookie (cookieName) {
 }
 
 exports.parseCookies = parseCookies
+exports.parse = parse
 exports.setCookies = setCookie
 exports.setCookie = setCookie
 exports.removeCookie = removeCookie
