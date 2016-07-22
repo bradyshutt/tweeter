@@ -7,7 +7,7 @@ function submitPost (req, post, cb) {
   var user = req.cookies.username || null
   if (user === null) throw new Error('User cannot be null to post')
   db.run(
-    'INSERT INTO posts VALUES' +
+    'INSERT INTO posts VALUES ' +
     '($postID, $username, $numLikes, $postDate, $postContent)',
     {
       '$postID': null,
@@ -23,10 +23,10 @@ function submitPost (req, post, cb) {
   )
 }
 
-function getAllPosts (cb) {
+function allPosts (cb) {
   db.all(
-    'SELECT * FROM posts' +
-    'JOIN users ON users.username = posts.username' +
+    'SELECT * FROM posts ' +
+    'JOIN users ON users.username = posts.username ' +
     'ORDER by posts.postID DESC'
   , function (err, data) {
     if (err) throw err
@@ -34,5 +34,31 @@ function getAllPosts (cb) {
   })
 }
 
+function getPost (postID, cb) {
+  db.get(
+    'SELECT * FROM posts ' +
+    'WHERE postID=?', postID,
+    (err, row) => {
+      if (err) {
+        cpr.err('Post not found. ID: ' + postID)
+        cb(null)
+      } else {
+        cb(row)
+      }
+    }
+  )
+}
+
+function deletePost (postID, cb) {
+  db.run(
+    'DELETE FROM posts ' +
+    'WHERE postID = ?', postID,
+    cb()
+  )
+}
+
 exports.submitPost = submitPost
-exports.getAllPosts = getAllPosts
+exports.allPosts = allPosts
+exports.deletePost = deletePost
+exports.getPost = getPost
+

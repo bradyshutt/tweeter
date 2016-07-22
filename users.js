@@ -36,31 +36,6 @@ function login (name, password, cb) {
   })
 }
 
-function createSession (req, res, cb) {
-  cpr('c[Creating a new session for ' + req.username + ']')
-  var sessionKey = req.username + rand(160, 36)
-
-  db.serialize(function () {
-    db.run('DELETE FROM sessions WHERE username=\'' + req.username + '\'')
-
-    db.run('INSERT INTO sessions VALUES (?, ?)', req.username, sessionKey)
-
-    res.setCookie({
-      'sessionkey': {
-        'val': sessionKey,
-        'life': 60000 * 24,
-        'path': '/'
-      },
-      'username': {
-        'val': req.username,
-        'life': 60000 * 24,
-        'path': '/'
-      }
-    })
-    cb()
-  })
-}
-
 function logout (res, cb) {
   var username = res.user.username || new Error('No username provided to logout: ' + username)
   cpr('m[' + username + ' is logging out. ]')
@@ -72,7 +47,7 @@ function deleteUser (username, cb) {
   db.run('DELETE FROM users WHERE username=(?)', username, cb)
 }
 
-function getAllUsers (callback) {
+function allUsers (callback) {
   db.all('SELECT * FROM users', function (err, rows) {
     if (err) throw err
     callback(rows)
@@ -100,6 +75,7 @@ function validateSession (req, cb) {
       'WHERE users.username = \'' + req.username + '\''
     , function (err, row) {
       if (err) { throw err }
+
       if (row === undefined || row.sessionKey !== sessionKey) {
         cpr('r[Session validation failed.]')
         cb(null, false)
@@ -135,8 +111,32 @@ function removeSession (res, username, cb) {
   })
 }
 
+function createSession (req, res, cb) {
+  cpr('c[Creating a new session for ' + req.username + ']')
+  var sessionKey = req.username + rand(160, 36)
+  db.serialize(function () {
+    db.run('DELETE FROM sessions WHERE username=\'' + req.username + '\'')
+    db.run('INSERT INTO sessions VALUES (?, ?)', req.username, sessionKey,
+    () => {
+      res.setCookie({
+        'sessionkey': {
+          'val': sessionKey,
+          'life': 60000 * 24,
+          'path': '/'
+        },
+        'username': {
+          'val': req.username,
+          'life': 60000 * 24,
+          'path': '/'
+        }
+      })
+      cb()
+    })
+  })
+}
+
 exports.addUser = addUser
-exports.getAllUsers = getAllUsers
+exports.allUsers = allUsers
 exports.getUser = getUser
 exports.login = login
 exports.logout = logout

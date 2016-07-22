@@ -1,6 +1,7 @@
 /* global cpr */
 var views = require('./views')
 var users = require('./users')
+var posts = require('./posts')
 var fs = require('fs')
 var formidable = require('formidable')
 
@@ -22,7 +23,7 @@ function home (req, res) {
 function allUsers (req, res) {
   cpr('y[allUsers controller]')
   var viewContext = { }
-  users.getAllUsers(function (allUsers) {
+  users.allUsers(function (allUsers) {
     viewContext.allUsers = allUsers
     if (req.validated) {
       users.getUser(req.cookies.username, function (user) {
@@ -133,12 +134,11 @@ function logout (req, res) {
 function allPosts (req, res) {
   var username = req.cookies.username || null
   var viewContext = { }
-
-  if (res.validated) {
+  if (req.validated) {
     users.getUser(username, function (user) {
       viewContext.user = user
       viewContext.loggedin = true
-      users.getAllPosts(function (posts) {
+      posts.allPosts(function (posts) {
         viewContext.posts = posts
         views.viewAllPosts(res, viewContext)
       })
@@ -147,6 +147,7 @@ function allPosts (req, res) {
 }
 
 function submitPost (req, res) {
+  cpr.notice('HELLO')
   if (req.method !== 'POST') throw new Error('Method is not POST.')
   var form = new formidable.IncomingForm()
   form.parse(req, function (err, fields) {
@@ -156,10 +157,25 @@ function submitPost (req, res) {
       'username': req.cookies.username,
       'date': new Date()
     }
-    users.submitPost(req, post, function () {
+    posts.submitPost(req, post, () => {
       cpr('y[Redirecting to /posts/all]')
       res.redirect('/posts/all')
     })
+  })
+}
+
+function deletePost (req, res, postID) {
+  posts.getPost(parseInt(postID), (post) => {
+    console.log('post: ' + post)
+    console.log(post.username)
+    if (post.username === req.username) {
+      console.log('delete post')
+      posts.deletePost(postID, () => {
+        res.redirect('/posts')
+      })
+    } else {
+      res.end('You can\'t delete someone elses post!')
+    }
   })
 }
 
@@ -175,3 +191,4 @@ exports.logout = logout
 exports.allPosts = allPosts
 exports.submitPost = submitPost
 exports.deleteUser = deleteUser
+exports.deletePost = deletePost

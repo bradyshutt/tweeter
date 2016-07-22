@@ -33,10 +33,12 @@ function initDB (cb) {
       'numLikes INTEGER, ' +
       'postDate TEXT NOT NULL, ' +
       'postContent TEXT NOT NULL, ' +
-      'FOREIGN KEY(username) REFERENCES users(username))'
+      'FOREIGN KEY(username) REFERENCES users(username))',
+      /*
+       * Run callback after last serialized query is finished
+       */
+      cb()
     )
-
-    cb()
   })
 }
 

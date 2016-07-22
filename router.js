@@ -2,44 +2,50 @@ var controllers = require('./controllers.js')
 
 var routes = [ ]
 
-// ROUTE TO HOME PAGE
+/* ROUTE TO HOME PAGE */
 addRoute('GET', [ /^$/, /^\/$/ ], controllers.home)
 
-// REQUEST ALL USERS
+/* REQUEST ALL USERS */
 addRoute('GET', [ /^\/users$/, /^\/users\/all$/ ], controllers.allUsers)
 
-// USER SIGN UP
+/* USER SIGN UP */
 addRoute('GET', /^\/users\/signup$/, controllers.signup)
 
-// USER SIGN UP
+/* USER SIGN UP */
 addRoute('POST', /^\/users\/signup$/, controllers.signup)
 
-// USER LOG IN
+/* USER LOG IN */
 addRoute('GET', [ /^\/login$/, /^\/users\/login$/ ], controllers.login)
 
-// USER LOG IN SUBMIT
+/* USER LOG IN SUBMIT */
 addRoute('POST', /^\/users\/login$/, controllers.login)
 
-// USER LOG OUT
+/* USER LOG OUT */
 addRoute('GET', [ /^\/logout$/, /^\/users\/logout/ ], controllers.logout)
 
-// REQUEST A USERS PROFILE
+/* REQUEST A USERS PROFILE */
 addRoute('GET', /^\/users\/u\/([^\/]+)$/, function (req, res, args) {
   console.log('username: ' + args[0])
 })
 
-// DELETE A USER
+/* DELETE A USER */
 addRoute('GET', /^\/users\/delete\/([^\/]+)$/, (req, res, un) => {
   controllers.deleteUser(req, res, un)
 })
 
-// REQUEST ALL POSTS
+/* REQUEST ALL POSTS */
 addRoute('GET', [ /^\/posts$/, /^\/posts\/all$/ ], controllers.allPosts)
 
-// REQUEST STATIC FILE
+/* DELETE A POST */
+addRoute('GET', /^\/posts\/delete\/([^\/]+)$/, controllers.deletePost)
+
+/* SUBMIT A POST */
+addRoute('POST', /^\/posts\/submit$/, controllers.submitPost)
+
+/* REQUEST STATIC FILE */
 addRoute('GET', /^\/static\/([^\/]+)\/([^\/]+)$/, controllers.staticFile)
 
-// REQUEST IMAGE FILE
+/* REQUEST IMAGE FILE */
 addRoute('GET', /^\/images\/([^\/]+)$/, controllers.image)
 
 function addRoute (method, regexURL, func) {

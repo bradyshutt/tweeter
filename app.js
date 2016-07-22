@@ -49,10 +49,9 @@ function examineRequest (req, res, cb) {
         cb()
       })
     }
+  } else {
+    cb()
   }
-
-  if (req.method === 'POST') { /* TODO: SCAN FORM DATA */ }
-
-  cb()
+  // if (req.method === 'POST') { /* TODO: SCAN FORM DATA */ }
 }
 
