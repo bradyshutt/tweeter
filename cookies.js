@@ -6,7 +6,7 @@
 function parseCookies (req) {
   req.cookies = req.cookies || { }
   if (req.headers.cookie) {
-    req.headers.cookie.split(';').forEach(function (cookie) {
+    req.headers.cookie.split(';').forEach((cookie) => {
       var split = cookie.split('=')
       req.cookies[split[0].trim()] = split[1].split(' ')[0].trim()
     })
@@ -16,7 +16,7 @@ function parseCookies (req) {
 function parse (req) {
   req.cookies = req.cookies || { }
   if (req.headers.cookie) {
-    req.headers.cookie.split(';').forEach(function (cookie) {
+    req.headers.cookie.split(';').forEach((cookie) => {
       var split = cookie.split('=')
       req.cookies[split[0].trim()] = split[1].split(' ')[0].trim()
     })

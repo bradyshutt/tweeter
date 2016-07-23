@@ -24,7 +24,7 @@ addRoute('POST', /^\/users\/login$/, controllers.login)
 addRoute('GET', [ /^\/logout$/, /^\/users\/logout/ ], controllers.logout)
 
 /* REQUEST A USERS PROFILE */
-addRoute('GET', /^\/users\/u\/([^\/]+)$/, function (req, res, args) {
+addRoute('GET', /^\/users\/u\/([^\/]+)$/, (req, res, args) => {
   console.log('username: ' + args[0])
 })
 
@@ -50,7 +50,7 @@ addRoute('GET', /^\/images\/([^\/]+)$/, controllers.image)
 
 function addRoute (method, regexURL, func) {
   if (regexURL && regexURL.constructor === Array) {
-    regexURL.forEach(function (val) {
+    regexURL.forEach((val) => {
       routes.push({
         method: method,
         pattern: val,
@@ -71,7 +71,7 @@ function searchRoutes (req, res) {
   var matches
   var routed = false
 
-  routes.forEach(function (route) {
+  routes.forEach((route) => {
     /* Saves regex matches obj to 'matches' */
     if (route.method === req.method &&
       (matches = req.url.match(route.pattern))) {

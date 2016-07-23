@@ -16,9 +16,9 @@ function submitPost (req, post, cb) {
       '$postDate': new Date().toDateString().slice(0, -4).slice(4),
       '$postContent': post.text
     }
-    , function (err) {
+    , (err) => {
       if (err) throw err
-      cb()
+      cb(null)
     }
   )
 }
@@ -28,9 +28,9 @@ function allPosts (cb) {
     'SELECT * FROM posts ' +
     'JOIN users ON users.username = posts.username ' +
     'ORDER by posts.postID DESC'
-  , function (err, data) {
+  , (err, data) => {
     if (err) throw err
-    cb(data)
+    cb(null, data)
   })
 }
 
@@ -43,7 +43,7 @@ function getPost (postID, cb) {
         cpr.err('Post not found. ID: ' + postID)
         cb(null)
       } else {
-        cb(row)
+        cb(null, row)
       }
     }
   )
@@ -52,8 +52,11 @@ function getPost (postID, cb) {
 function deletePost (postID, cb) {
   db.run(
     'DELETE FROM posts ' +
-    'WHERE postID = ?', postID,
-    cb()
+    'WHERE postID = ?',
+    postID, (err) => {
+      if (err) throw err
+      cb(null)
+    }
   )
 }
 

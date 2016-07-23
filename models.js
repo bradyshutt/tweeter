@@ -5,7 +5,7 @@ var db = new sql.Database('database.db')
 
 function initDB (cb) {
   cpr.db('Initializing Database')
-  db.serialize(function () {
+  db.serialize(() => {
     db.run('PRAGMA foreign_keys = ON')
 
     db.run(
@@ -44,7 +44,7 @@ function initDB (cb) {
 
 function closeDB () {
   cpr('ly[Closing Database]')
-  db.close(function (err) { if (err) throw err })
+  db.close((err) => { if (err) throw err })
 }
 
 exports.initDB = initDB

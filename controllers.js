@@ -10,7 +10,8 @@ function home (req, res) {
   var viewContext = { }
 
   if (req.validated) {
-    users.getUser(username, function (user) {
+    users.getUser(username, (err, user) => {
+      if (err) throw err
       viewContext.user = user
       viewContext.loggedin = true
       views.viewHome(res, viewContext)
@@ -23,10 +24,12 @@ function home (req, res) {
 function allUsers (req, res) {
   cpr('y[allUsers controller]')
   var viewContext = { }
-  users.allUsers(function (allUsers) {
+  users.allUsers((err, allUsers) => {
+    if (err) throw err
     viewContext.allUsers = allUsers
     if (req.validated) {
-      users.getUser(req.cookies.username, function (user) {
+      users.getUser(req.cookies.username, (err, user) => {
+        if (err) throw err
         viewContext.user = user
         viewContext.loggedin = true
         views.viewAllUsers(res, viewContext)
@@ -45,7 +48,8 @@ function deleteUser (req, res, username) {
 
 function notFound (req, res, path) {
   var viewContext = { 'path': path }
-  users.getUser(req.cookies.username, function (user) {
+  users.getUser(req.cookies.username, (err, user) => {
+    if (err) throw err
     viewContext.user = user
     viewContext.loggedin = true
     views.viewPageNotFound(res, viewContext)
@@ -96,7 +100,7 @@ function signup (req, res) {
     var form = new formidable.IncomingForm()
 
     form.uploadDir = 'static/images/'
-    form.parse(req, function (err, fields, files) {
+    form.parse(req, (err, fields, files) => {
       if (err) throw err
       fs.renameSync(files.profilePicture.path,
         'static/images/' + files.profilePicture.name)
@@ -110,9 +114,10 @@ function login (req, res) {
   if (req.method === 'GET') views.viewLogin(res)
   else if (req.method === 'POST') {
     var form = new formidable.IncomingForm()
-    form.parse(req, function (err, fields) {
+    form.parse(req, (err, fields) => {
       if (err) throw err
-      users.login(fields.username, fields.password, function (resault) {
+      users.login(fields.username, fields.password, (err, resault) => {
+        if (err) throw err
         if (resault) {
           cpr('g[LOGIN SUCCESS!!]')
           req.username = fields.username
@@ -135,10 +140,12 @@ function allPosts (req, res) {
   var username = req.cookies.username || null
   var viewContext = { }
   if (req.validated) {
-    users.getUser(username, function (user) {
+    users.getUser(username, (err, user) => {
+      if (err) throw err
       viewContext.user = user
       viewContext.loggedin = true
-      posts.allPosts(function (posts) {
+      posts.allPosts((err, posts) => {
+        if (err) throw err
         viewContext.posts = posts
         views.viewAllPosts(res, viewContext)
       })
@@ -150,7 +157,7 @@ function submitPost (req, res) {
   cpr.notice('HELLO')
   if (req.method !== 'POST') throw new Error('Method is not POST.')
   var form = new formidable.IncomingForm()
-  form.parse(req, function (err, fields) {
+  form.parse(req, (err, fields) => {
     if (err) throw err
     var post = {
       'text': fields.postContent,
@@ -165,7 +172,8 @@ function submitPost (req, res) {
 }
 
 function deletePost (req, res, postID) {
-  posts.getPost(parseInt(postID), (post) => {
+  posts.getPost(parseInt(postID), (err, post) => {
+    if (err) throw err
     console.log('post: ' + post)
     console.log(post.username)
     if (post.username === req.username) {

@@ -7,7 +7,7 @@ var rand = require('csprng') // used to generate secure random session key
 function addUser (user, cb) {
   cpr('m[Adding a new user: ' + user.username + ' ]')
 
-  db.serialize(function () {
+  db.serialize(() => {
     db.run(
       'INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)'
       , [
@@ -26,12 +26,12 @@ function addUser (user, cb) {
 function login (name, password, cb) {
   cpr('m[Authenticating login for ' + name + ']')
   db.get('SELECT password FROM users WHERE username=\'' + name + '\''
-  , function (err, row) {
+  , (err, row) => {
     if (err) { throw err }
     var hash = row.password.toString()
-    bcrypt.compare(password, hash, function (err, success) {
+    bcrypt.compare(password, hash, (err, success) => {
       if (err) { throw err }
-      cb(success)
+      cb(null, success)
     })
   })
 }
@@ -48,17 +48,17 @@ function deleteUser (username, cb) {
 }
 
 function allUsers (callback) {
-  db.all('SELECT * FROM users', function (err, rows) {
+  db.all('SELECT * FROM users', (err, rows) => {
     if (err) throw err
-    callback(rows)
+    callback(null, rows)
   })
 }
 
 function getUser (username, callback) {
   db.get('SELECT * FROM users WHERE username=\'' + username + '\'',
-    function (err, row) {
+    (err, row) => {
       if (err) throw err
-      callback(row)
+      callback(null, row)
     }
   )
 }
@@ -73,7 +73,7 @@ function validateSession (req, cb) {
       'SELECT * FROM sessions ' +
       'JOIN users ON users.username = sessions.username ' +
       'WHERE users.username = \'' + req.username + '\''
-    , function (err, row) {
+    , (err, row) => {
       if (err) { throw err }
 
       if (row === undefined || row.sessionKey !== sessionKey) {
@@ -88,7 +88,7 @@ function validateSession (req, cb) {
 }
 
 function removeSession (res, username, cb) {
-  db.serialize(function () {
+  db.serialize(() => {
     db.run(
       'DELETE FROM sessions ' +
       'WHERE username=\'' + username + '\''
@@ -114,7 +114,7 @@ function removeSession (res, username, cb) {
 function createSession (req, res, cb) {
   cpr('c[Creating a new session for ' + req.username + ']')
   var sessionKey = req.username + rand(160, 36)
-  db.serialize(function () {
+  db.serialize(() => {
     db.run('DELETE FROM sessions WHERE username=\'' + req.username + '\'')
     db.run('INSERT INTO sessions VALUES (?, ?)', req.username, sessionKey,
     () => {

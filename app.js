@@ -14,7 +14,7 @@ var routeFile = router.file
 
 global.cpr = colorPrint.cpr
 
-http.createServer(function (req, res) {
+http.createServer((req, res) => {
   /* If requesting a static file, skip cookie parsing,
    * db initialization, and session validation */
   if ((/^\/static\//).test(req.url) || (/^\/images\//).test(req.url)) {
