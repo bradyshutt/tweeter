@@ -1,4 +1,5 @@
 /* global cpr */
+'use strict'
 
 Array.prototype.contains = function (val) { //eslint-disable-line
   for (var x in this) {

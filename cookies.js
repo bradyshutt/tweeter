@@ -1,5 +1,5 @@
 /* global cpr */
-
+'use strict'
 /* TODO: Have parseCookies return a 'cookie-handler' object
  * with methods to set/remove/get cookies */
 

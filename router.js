@@ -1,5 +1,6 @@
-var controllers = require('./controllers.js')
+'use strict'
 
+var controllers = require('./controllers.js')
 var routes = [ ]
 
 /* ROUTE TO HOME PAGE */

@@ -1,4 +1,5 @@
 /* global cpr */
+'use strict'
 var sql = require('sqlite3').verbose()
 var db = new sql.Database('database.db')
 

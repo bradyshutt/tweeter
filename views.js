@@ -1,4 +1,5 @@
 /* global cpr */
+'use strict'
 var fs = require('fs')
 var mustache = require('mustache')
 

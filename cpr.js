@@ -1,3 +1,5 @@
+'use strict'
+
 // Print logs in magenta for server actions
 // Print logs in yellow for routing
 // Print logs in blue for serving pages

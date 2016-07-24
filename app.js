@@ -1,6 +1,8 @@
 /* TODO: all err arg to all callbacks to adhere to standards */
 /* TODO: change all '//' comments to '/*' ones */
 
+'use strict'
+
 /* global cpr */
 var http = require('http')
 var utils = require('./utils')

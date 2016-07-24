@@ -1,4 +1,4 @@
-
+'use strict'
 var res = { }
 var req = {
 

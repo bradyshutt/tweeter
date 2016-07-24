@@ -1,4 +1,5 @@
 /* global cpr */
+'use strict'
 var views = require('./views')
 var users = require('./users')
 var posts = require('./posts')
