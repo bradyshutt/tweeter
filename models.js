@@ -1,7 +1,6 @@
 /* global cpr */
 var sql = require('sqlite3').verbose()
 var db = new sql.Database('database.db')
-// var formidable = require('formidable')
 
 function initDB (cb) {
   cpr.db('Initializing Database')
